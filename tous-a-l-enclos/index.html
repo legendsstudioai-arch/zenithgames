@@ -1,59 +1,277 @@
-<!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tous à l’Enclos ! — bientôt sur Android | ZenithGames Studio</title>
-<meta name="description" content="Fais sortir chaque animal par l’enclos de sa couleur, dans le bon ordre, et remplis ton zoo.">
-<meta property="og:title" content="Tous à l’Enclos !"><meta property="og:description" content="Chaque animal a sa maison. Trouve l’ordre."><meta property="og:image" content="https://legendsstudioai-arch.github.io/zenithgames/tous-a-l-enclos/poster.jpg">
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Tous à l’Enclos ! — joue à la démo | ZenithGames Studio</title>
 <style>
-:root{--acc:#22c55e}
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:#12101c;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center}
-header{padding:18px 16px 0;width:100%;max-width:520px;display:flex;align-items:center;gap:10px;color:#b9b3d1;font-size:14px}
-header .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#6b4fd8,#2fb8a8)}
-main{width:100%;max-width:520px;padding:14px 16px 40px;text-align:center}
-.phone{position:relative;width:min(60vw,236px);aspect-ratio:9/16;margin:8px auto 18px;border-radius:28px;overflow:hidden;background:#000;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 6px #23203a}
-.phone video{width:100%;height:100%;object-fit:cover;display:block}
-h1{font-size:30px;margin:4px 0 2px;line-height:1.1}
-.tag{color:var(--acc);font-weight:700;font-size:18px;margin:0 0 10px}
-p.desc{color:#cfc9e6;font-size:16px;line-height:1.45;margin:0 0 18px}
-.badge{display:inline-block;background:#23203a;color:#c9c3e3;border-radius:999px;padding:6px 14px;font-size:13px;margin:0 4px 18px}
-.btn{display:block;width:100%;border:0;border-radius:999px;background:#2ecc71;color:#fff;font-size:22px;font-weight:800;padding:18px;cursor:pointer;box-shadow:0 10px 30px rgba(46,204,113,.35);transition:transform .1s}
-.btn:active{transform:scale(.98)}
-#form{display:none;margin-top:16px;background:#1c1930;border-radius:18px;padding:18px}
-#form p{margin:0 0 10px;color:#e6e2f5}
-#form input[type=email]{width:100%;padding:14px;border-radius:12px;border:1px solid #3a3556;background:#12101c;color:#fff;font-size:16px;margin-bottom:10px}
-#form button{width:100%;border:0;border-radius:12px;background:var(--acc);color:#111;font-weight:800;font-size:17px;padding:14px;cursor:pointer}
-#ok{display:none;margin-top:16px;background:#183a2a;border-radius:18px;padding:18px;color:#bff3d3;font-weight:600}
-footer{color:#7f7899;font-size:12px;line-height:1.5;padding:0 16px 30px;max-width:520px;text-align:center}
-footer a{color:#a79fc9}
+  html,body{margin:0;height:100%;background:#2a221b;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+  #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  #c{display:block;width:min(100vw,calc(100dvh*9/16));height:auto;aspect-ratio:9/16;background:#d9cfc4;touch-action:none}
+  #end{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(30,22,15,.78);padding:20px;box-sizing:border-box}
+  #card{background:#fff8ee;border-radius:22px;padding:26px 22px;max-width:340px;width:100%;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+  #card h2{margin:0 0 6px;font-size:28px;color:#3a2a1c}
+  #card p{margin:8px 0 18px;font-size:16px;line-height:1.4;color:#5a4a3a}
+  .btn{display:block;width:100%;border:0;border-radius:16px;padding:16px;font-size:20px;font-weight:800;color:#fff;background:#22c55e;box-shadow:0 6px 0 #15803d;cursor:pointer}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #15803d}
+  .lnk{margin-top:16px;background:none;border:0;color:#8a7a6a;font-size:15px;text-decoration:underline;cursor:pointer}
+  #form{display:none;margin-top:4px}
+  #form input[type=email]{width:100%;box-sizing:border-box;padding:14px;font-size:17px;border:2px solid #d8c9b6;border-radius:12px;margin-bottom:10px}
+  #ok{display:none;font-weight:700;color:#2e7d32;font-size:17px}
 </style>
-<!-- Meta Pixel -->
+<meta name="description" content="Ramène chaque animal dans son enclos. Joue à la démo gratuite.">
+<meta property="og:title" content="Tous à l’Enclos !"><meta property="og:description" content="Chaque animal a sa maison. Trouve l’ordre."><meta property="og:image" content="https://legendsstudioai-arch.github.io/zenithgames/tous-a-l-enclos/poster.jpg">
 <script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-fbq('init','1102766998963847');fbq('track','PageView');</script>
-<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1102766998963847&ev=PageView&noscript=1"/></noscript>
-</head><body>
-<header><div class="logo"></div><div><strong style="color:#fff">ZenithGames Studio</strong><br>Jeu en développement — Android</div></header>
-<main>
-  <div class="phone"><video src="video.mp4" poster="poster.jpg" autoplay muted loop playsinline></video></div>
-  <h1>Tous à l’Enclos !</h1>
-  <p class="tag">Chaque animal a sa maison. Trouve l’ordre.</p>
-  <p class="desc">Fais sortir chaque animal par l’enclos de sa couleur, dans le bon ordre, et remplis ton zoo.</p>
-  <span class="badge">Gratuit</span><span class="badge">Android</span><span class="badge">Des centaines de niveaux</span>
-  <button class="btn" id="cta" onclick="want()">Je veux jouer</button>
-  <div id="form">
-    <p>Merci ! Laisse ton e-mail pour être prévenu à la sortie (et tester en avant-première).</p>
-    <form id="f" onsubmit="return send(event)">
-      <input type="hidden" name="jeu" value="Tous à l’Enclos !">
-      <input type="email" name="email" placeholder="ton@email.com" required>
-      <button type="submit">Prévenez-moi</button>
-    </form>
-  </div>
-  <div id="ok">C’est noté ! On te prévient dès que Tous à l’Enclos ! est disponible.</div>
-</main>
-<footer>Ton e-mail sert uniquement à te prévenir de la sortie du jeu ; il n’est ni partagé ni revendu. Cette page utilise le pixel Meta pour mesurer l’intérêt pour nos jeux.<br>Contact : <a href="mailto:legendsstudioai@gmail.com">legendsstudioai@gmail.com</a> · © ZenithGames Studio</footer>
-<script>
-function want(){ try{ fbq('track','Lead',{content_name:'tous-a-l-enclos'}); }catch(e){} document.getElementById('cta').style.display='none'; document.getElementById('form').style.display='block'; document.querySelector('#form input[type=email]').focus(); }
-async function send(e){ e.preventDefault(); const f=document.getElementById('f'); const b=f.querySelector('button'); b.disabled=true; b.textContent='Envoi…';
-  try{ const r=await fetch('https://formspree.io/f/xeaovldj',{method:'POST',headers:{'Accept':'application/json'},body:new FormData(f)}); if(!r.ok) throw 0;
-    try{ fbq('track','CompleteRegistration',{content_name:'tous-a-l-enclos'}); }catch(e){} document.getElementById('form').style.display='none'; document.getElementById('ok').style.display='block'; }
-  catch(err){ b.disabled=false; b.textContent='Réessayer'; alert('Envoi impossible, réessaie dans un instant.'); } return false; }
+fbq('init','1102766998963847');fbq('track','PageView');
+// suivi de la démo : événements standards (lisibles par campagne) + événement détaillé
+(function(){var S='tous-a-l-enclos',STD={DemoStart:'ViewContent',DemoLevel1:'AddToCart',DemoDone:'InitiateCheckout',DemoWant:'Lead'};
+window.onDemoEvent=function(n,d){try{var p={content_name:S};for(var k in (d||{}))p[k]=d[k];if(STD[n])fbq('track',STD[n],{content_name:S});fbq('trackCustom',n,p);}catch(e){}};
+window.onDemoEmail=function(f){var b=f.querySelector('button');b.disabled=true;b.textContent='Envoi…';
+fetch('https://formspree.io/f/xeaovldj',{method:'POST',headers:{'Accept':'application/json'},body:new FormData(f)}).then(function(r){if(!r.ok)throw 0;try{fbq('track','CompleteRegistration',{content_name:S});}catch(e){}document.getElementById('form').style.display='none';document.getElementById('ok').style.display='block';}).catch(function(){b.disabled=false;b.textContent='Réessayer';});};})();
 </script>
-</body></html>
+</head>
+<body>
+<div id="wrap"><canvas id="c" width="1080" height="1920"></canvas></div>
+<div id="end"><div id="card">
+  <h2>Bravo&nbsp;! 🎉</h2>
+  <p id="endtxt">Tu as terminé la démo. Le jeu complet arrive bientôt sur Android, avec des centaines de niveaux et un zoo à remplir.</p>
+  <button class="btn" id="cta">Je veux le jeu complet</button>
+  <div id="form"><p>Laisse ton e-mail pour être prévenu à la sortie.</p>
+    <form id="f"><input type="hidden" name="jeu" value="Tous à l'Enclos ! (démo)"><input type="email" name="email" placeholder="ton@email.com" required><button class="btn" type="submit">Prévenez-moi</button></form></div>
+  <div id="ok">C’est noté ! On te prévient dès la sortie.</div>
+  <p style="font-size:11px;line-height:1.35;color:#9a8a7a;margin:14px 0 0">Ton e-mail sert uniquement à te prévenir de la sortie du jeu ; il n’est ni partagé ni revendu. Cette page utilise le pixel Meta pour mesurer l’intérêt pour nos jeux. Contact : legendsstudioai@gmail.com · © ZenithGames Studio</p>
+  <button class="lnk" id="again">Rejouer la démo</button>
+</div></div>
+<script>
+// Tous à l’Enclos ! — démo jouable 3 niveaux (page de test du concept)
+const W = 1080, H = 1920;
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif'; const STROKE = '#2b2b2b';
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const tw = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
+const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const COL = { red: '#e74c3c', blue: '#3b82f6', green: '#22c55e', yellow: '#f5c542', purple: '#a855f7', orange: '#f97316', teal: '#14b8a6', pink: '#ff6f91' };
+function shade(hex, k) { const n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  const f = c => clamp(Math.round(k < 0 ? c * (1 + k) : c + (255 - c) * k), 0, 255); return `rgb(${f(r)},${f(g)},${f(b)})`; }
+function rr(x, y, w, h, r) { r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+
+// ---------- grille ----------
+const N = 6, CS = 145, GX = 105, GY = 620, EXIT_DUR = .38, BUMP_DUR = .34;
+const DIRV = { L: [-1, 0], R: [1, 0], U: [0, -1], D: [0, 1] };
+const cellXY = (c, r) => [GX + c * CS, GY + r * CS];
+
+// ---------- niveaux ----------
+// [couleur, colonne, ligne, largeur, hauteur, direction]. Blocs + portes repris de niveaux_fixe.json
+// (niveaux 1, 21 et 35) ; profondeur de chaque bloc dans le couloir de sa porte recalculée pour la
+// mécanique "tap" et vérifiée (ordre de sortie existant) par choix_niveaux.py.
+const LEVELS = [
+  [["pink", 5, 2, 1, 2, "R"], ["yellow", 4, 0, 2, 1, "U"], ["blue", 3, 0, 1, 3, "L"], ["green", 0, 1, 3, 1, "D"]],
+  [["purple", 3, 4, 1, 1, "D"], ["blue", 3, 5, 1, 1, "L"], ["green", 4, 2, 2, 1, "D"], ["red", 2, 0, 1, 2, "R"], ["teal", 0, 5, 3, 1, "D"], ["pink", 4, 3, 1, 3, "R"], ["yellow", 2, 2, 2, 2, "U"]],
+  [["teal", 0, 2, 1, 1, "D"], ["green", 1, 1, 1, 1, "D"], ["pink", 3, 1, 1, 1, "L"], ["orange", 4, 1, 1, 1, "U"], ["purple", 2, 2, 3, 1, "D"], ["red", 1, 2, 1, 2, "L"], ["red", 0, 4, 1, 2, "L"], ["orange", 2, 3, 1, 3, "R"], ["yellow", 5, 0, 1, 2, "R"], ["blue", 0, 0, 3, 1, "U"]]
+];
+function block(color, c, r, w, h, dir) { return { color, c, r, w, h, dir, exitAt: null, bumps: [] }; }
+const GAIN = 30;
+
+// ---------- suivi (branché sur le pixel à l'intégration) ----------
+const sent = {};
+function track(name, data) { if (sent[name]) return; sent[name] = 1; try { if (window.onDemoEvent) window.onDemoEvent(name, data || {}); } catch (e) {} }
+
+// ---------- état ----------
+let blocks, levelIdx = 0, tPlay = 0, playX = [], playRipples = [], floats = [], won = null, coins = 0, shown = 0, bumpAt = -9;
+let lastTap = 0, tapped = false, msg = null, ended = false, blockedCount = 0, lives = 3, lost = null, coinsAtStart = 0, fails = 0, lifeAt = -9;
+function startLevel(i) { levelIdx = i; blocks = LEVELS[i].map(a => block(...a)); won = null; lost = null; lives = 3; coinsAtStart = coins; lastTap = tPlay; msg = null; playX = []; floats = []; }
+const present = b => b.exitAt === null;
+function blockAt(c, r, skip) { return blocks.find(o => o !== skip && present(o) && c >= o.c && c < o.c + o.w && r >= o.r && r < o.r + o.h); }
+// nombre de cases libres devant le bloc ; blocked = un autre animal est sur le chemin de la porte
+function pathOf(b) {
+  const [vx, vy] = DIRV[b.dir];
+  for (let k = 1; k <= N; k++) { let inside = false;
+    for (let i = 0; i < b.w; i++) for (let j = 0; j < b.h; j++) { const c = b.c + i + vx * k, r = b.r + j + vy * k;
+      if (c < 0 || c >= N || r < 0 || r >= N) continue; inside = true; if (blockAt(c, r, b)) return { blocked: true, gap: k - 1 }; }
+    if (!inside) break; }
+  return { blocked: false, gap: 0 };
+}
+const centre = b => { const [x, y] = cellXY(b.c + b.w / 2, b.r + b.h / 2); return [x, y]; };
+const freeBlocks = () => blocks.filter(b => present(b) && !pathOf(b).blocked);
+const stuckBlocks = () => blocks.filter(b => present(b) && pathOf(b).blocked);
+function pick(x, y) {
+  let best = null, bd = 40; // tolérance : un doigt juste à côté d'un animal le touche quand même
+  for (const b of blocks) { if (!present(b)) continue; const [bx, by] = cellXY(b.c, b.r);
+    const dx = Math.max(bx - x, 0, x - (bx + b.w * CS)), dy = Math.max(by - y, 0, y - (by + b.h * CS)), d = Math.hypot(dx, dy);
+    if (d < bd) { bd = d; best = b; } }
+  return best;
+}
+function onTap(x, y) {
+  if (ended || won !== null || lost !== null) return;
+  playRipples.push([x, y, tPlay]); lastTap = tPlay;
+  if (!tapped) { tapped = true; track('DemoStart'); }
+  const b = pick(x, y); if (!b) return;
+  const p = pathOf(b);
+  if (p.blocked) {
+    b.bumps.push([tPlay, p.gap]); const [vx, vy] = DIRV[b.dir], [cx, cy] = centre(b);
+    playX.push([cx + vx * (b.w / 2 + p.gap) * CS, cy + vy * (b.h / 2 + p.gap) * CS, tPlay + BUMP_DUR * .4]);
+    blockedCount++; lives--; lifeAt = tPlay; msg = ['Un autre animal bloque le passage !', tPlay];
+    if (lives <= 0) { lost = tPlay; fails++; track('DemoFail' + (levelIdx + 1)); }
+    return;
+  }
+  b.exitAt = tPlay; coins += GAIN; floats.push([...centre(b), tPlay + .1]);
+}
+
+// ---------- rendu des animaux (repris de la scène pub) ----------
+function blockState(b, t) {
+  let dx = 0, dy = 0, alpha = 1, gone = false; const [vx, vy] = DIRV[b.dir];
+  for (const [tb, gap] of b.bumps) { const d = t - tb; if (d >= 0 && d < BUMP_DUR) { const k = Math.sin(d / BUMP_DUR * Math.PI) * (gap + .16); dx += vx * k; dy += vy * k; } }
+  if (b.exitAt !== null && t >= b.exitAt) {
+    const u = tw(t, b.exitAt, b.exitAt + EXIT_DUR);
+    let dist; if (b.dir === 'R') dist = N - b.c + 1; else if (b.dir === 'L') dist = b.c + b.w + 1; else if (b.dir === 'D') dist = N - b.r + 1; else dist = b.r + b.h + 1;
+    const e = u * u * .7 + u * .3; dx += vx * dist * e; dy += vy * dist * e; alpha = 1 - tw(u, .75, 1); if (u >= 1) gone = true;
+  }
+  return { dx, dy, alpha, gone };
+}
+function drawBlock(b, t, nudge = 0) {
+  const st = blockState(b, t); if (st.gone) return; const [vx, vy] = DIRV[b.dir];
+  const [x, y] = cellXY(b.c + st.dx + vx * nudge, b.r + st.dy + vy * nudge); const w = b.w * CS, h = b.h * CS, m = 8;
+  ctx.save(); ctx.globalAlpha = st.alpha;
+  ctx.beginPath(); ctx.rect(GX - 70, GY - 70, N * CS + 140, N * CS + 140); ctx.clip();
+  ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 8;
+  rr(x + m, y + m, w - 2 * m, h - 2 * m, 22); const g = ctx.createLinearGradient(x, y, x, y + h); g.addColorStop(0, shade(COL[b.color], .3)); g.addColorStop(1, shade(COL[b.color], -.2)); ctx.fillStyle = g; ctx.fill();
+  ctx.shadowColor = 'transparent';
+  rr(x + m + 14, y + m + 12, w - 2 * m - 28, (h - 2 * m) * .32, 14); ctx.fillStyle = 'rgba(255,255,255,.28)'; ctx.fill();
+  ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(0,0,0,.35)'; rr(x + m, y + m, w - 2 * m, h - 2 * m, 22); ctx.stroke();
+  drawFace(b, x, y, w, h, t);
+  ctx.restore();
+}
+function drawFace(b, x, y, w, h, t) {
+  // oreilles en haut, yeux qui regardent vers la porte, museau ; inquiet pendant un choc, ravi à la sortie
+  const cx = x + w / 2, cy = y + Math.min(h, w) * .5 + (h > w ? 10 : 0); const sc = Math.min(w, h) / CS; const [vx, vy] = DIRV[b.dir];
+  const worried = b.bumps.some(([tb]) => t >= tb && t < tb + .9), happy = b.exitAt !== null && t >= b.exitAt - .05;
+  const dark = shade(COL[b.color], -.45);
+  ctx.save(); ctx.translate(cx, cy); ctx.scale(sc, sc);
+  ctx.fillStyle = dark; for (const ex of [-38, 38]) { ctx.beginPath(); ctx.ellipse(ex, -58, 16, 22, ex < 0 ? -.3 : .3, 0, 7); ctx.fill(); }
+  ctx.fillStyle = '#ffb3c1'; for (const ex of [-38, 38]) { ctx.beginPath(); ctx.ellipse(ex, -58, 8, 12, ex < 0 ? -.3 : .3, 0, 7); ctx.fill(); }
+  for (const ex of [-22, 22]) { ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(ex, -8, 15, happy ? 8 : 17, 0, 0, 7); ctx.fill();
+    if (!happy) { const px = ex + vx * 7, py = -8 + vy * 9; ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(px, py, 8, 0, 7); ctx.fill(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(px + 3, py - 3, 3, 0, 7); ctx.fill(); }
+    else { ctx.strokeStyle = '#222'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(ex, -6, 10, Math.PI, 0); ctx.stroke(); } }
+  if (worried) { ctx.strokeStyle = '#222'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(-38, -24); ctx.lineTo(-12, -34); ctx.moveTo(38, -24); ctx.lineTo(12, -34); ctx.stroke(); }
+  ctx.translate(vx * 6, vy * 3); // le museau pointe lui aussi vers la porte
+  ctx.fillStyle = dark; ctx.beginPath(); ctx.ellipse(0, 14, 9, 6, 0, 0, 7); ctx.fill();
+  ctx.strokeStyle = '#222'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.beginPath();
+  if (happy) ctx.arc(0, 18, 14, .2, Math.PI - .2); else if (worried) ctx.arc(0, 38, 10, Math.PI + .3, -.3); else { ctx.moveTo(-10, 26); ctx.quadraticCurveTo(0, 32, 10, 26); }
+  ctx.stroke(); ctx.restore();
+}
+function doorRect(b) {
+  if (b.dir === 'R') return [GX + N * CS + 2, GY + b.r * CS, 48, b.h * CS];
+  if (b.dir === 'L') return [GX - 50, GY + b.r * CS, 48, b.h * CS];
+  if (b.dir === 'D') return [GX + b.c * CS, GY + N * CS + 2, b.w * CS, 48];
+  return [GX + b.c * CS, GY - 50, b.w * CS, 48];
+}
+function drawGrid(t) {
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#f2e9dc'); g.addColorStop(1, '#d9c9b5'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.25)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 16; rr(GX - 52, GY - 52, N * CS + 104, N * CS + 104, 34); ctx.fillStyle = '#5b4a3f'; ctx.fill(); ctx.restore();
+  rr(GX, GY, N * CS, N * CS, 12); ctx.fillStyle = '#8c7b6b'; ctx.fill();
+  for (let c = 0; c < N; c++) for (let r = 0; r < N; r++) { const [x, y] = cellXY(c, r); rr(x + 4, y + 4, CS - 8, CS - 8, 10); ctx.fillStyle = (c + r) % 2 ? '#a08e7c' : '#98887a'; ctx.fill(); }
+  // portes : une par animal, sur le bord, de la largeur de l'animal
+  for (const b of blocks) {
+    const [x, y, w, h] = doorRect(b);
+    let glow = 0; for (const tt of [b.exitAt, ...b.bumps.map(k => k[0])]) { if (tt === null) continue; const d = t - tt; if (d >= 0 && d < .5) glow = Math.max(glow, Math.sin(d / .5 * Math.PI)); }
+    ctx.save(); if (glow > 0) { ctx.shadowColor = '#fff'; ctx.shadowBlur = 40 * glow; }
+    rr(x + 6, y + 6, w - 12, h - 12, 8); ctx.fillStyle = glow > 0 ? shade(COL[b.color], .5 * glow) : COL[b.color]; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,.4)'; ctx.stroke(); ctx.restore();
+    ctx.fillStyle = 'rgba(255,255,255,.35)'; rr(x + 10, y + 10, w - 20, h - 20, 5); ctx.fill();
+  }
+}
+
+// ---------- UI ----------
+function drawCoin(x, y, r) { ctx.save(); ctx.translate(x, y); const g = ctx.createRadialGradient(-r * .3, -r * .3, r * .2, 0, 0, r); g.addColorStop(0, '#fff3a0'); g.addColorStop(.6, '#f5c542'); g.addColorStop(1, '#c98a12');
+  ctx.beginPath(); ctx.arc(0, 0, r, 0, 7); ctx.fillStyle = g; ctx.fill(); ctx.lineWidth = r * .12; ctx.strokeStyle = '#8a5a00'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, r * .62, 0, 7); ctx.stroke(); ctx.restore(); }
+function drawCounter(value, bump = 0, cy = 330) { ctx.save(); ctx.translate(W - 60, cy); ctx.scale(1 + bump, 1 + bump);
+  rr(-330, -52, 330, 104, 52); ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.fill();
+  drawCoin(-270, 0, 40); ctx.font = `bold 64px ${FONT}`; ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff'; ctx.fillText(String(value), -40, 4); ctx.restore(); }
+function drawRipple(x, y, u) { if (u <= 0 || u >= 1) return;
+  ctx.save(); ctx.globalAlpha = (1 - u) * .8; ctx.lineWidth = 10; ctx.strokeStyle = '#fff'; ctx.beginPath(); ctx.arc(x, y, 25 + u * 110, 0, 7); ctx.stroke(); ctx.restore(); }
+function drawX(x, y, u) { if (u <= 0) return; const s = back(clamp(u * 3, 0, 1));
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.lineWidth = 18; ctx.lineCap = 'round'; ctx.strokeStyle = '#e63946'; ctx.shadowColor = 'rgba(0,0,0,.3)'; ctx.shadowBlur = 10;
+  ctx.beginPath(); ctx.moveTo(-40, -40); ctx.lineTo(40, 40); ctx.moveTo(40, -40); ctx.lineTo(-40, 40); ctx.stroke(); ctx.restore(); }
+function drawBanner(text, u, y = 230, size = 96) {
+  if (u <= 0) return; const s = .6 + .4 * back(clamp(u, 0, 1)); const lines = text.split('\n'); if (lines.length > 1) size = 80;
+  ctx.save(); ctx.translate(W / 2, y + (lines.length - 1) * 30); ctx.scale(s, s);
+  ctx.font = `bold ${size}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  lines.forEach((ln, i) => { const yy = (i - (lines.length - 1) / 2) * size * 1.15;
+    ctx.save(); ctx.lineJoin = 'round'; ctx.lineWidth = 22; ctx.strokeStyle = STROKE; ctx.strokeText(ln, 0, yy);
+    ctx.shadowColor = 'rgba(0,0,0,.4)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 6; ctx.fillStyle = '#fff'; ctx.fillText(ln, 0, yy); ctx.restore(); });
+  ctx.restore();
+}
+function pill(x, y, w, h, text) { ctx.save(); rr(x, y, w, h, h / 2); ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.fill();
+  ctx.font = `bold 52px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff'; ctx.fillText(text, x + w / 2, y + h / 2 + 3); ctx.restore(); }
+function heart(x, y, s, on) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.beginPath(); ctx.moveTo(0, 12); ctx.bezierCurveTo(-34, -14, -16, -36, 0, -16); ctx.bezierCurveTo(16, -36, 34, -14, 0, 12); ctx.closePath();
+  ctx.fillStyle = on ? '#e63946' : 'rgba(0,0,0,.22)'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = on ? '#8f1d27' : 'rgba(0,0,0,.25)'; ctx.stroke(); ctx.restore(); }
+// animal conseillé par l'aide : libre, et de préférence avec un vrai trajet à faire (plus parlant)
+function hintBlock() { return freeBlocks().sort((a, b) => hintDist(b) - hintDist(a))[0]; }
+function hintDist(b) { return b.dir === 'R' ? N - b.c - b.w : b.dir === 'L' ? b.c : b.dir === 'D' ? N - b.r - b.h : b.r; }
+
+function render() {
+  ctx.clearRect(0, 0, W, H);
+  const helping = won === null && lost === null && !ended && (!tapped || tPlay - lastTap > 5), hb = helping ? hintBlock() : null;
+  drawGrid(tPlay);
+  // pointillés discrets de l'animal conseillé jusqu'à sa porte (uniquement pendant l'aide)
+  if (hb) { const [vx, vy] = DIRV[hb.dir], [cx, cy] = centre(hb), [dx, dy, dw, dh] = doorRect(hb);
+    const x0 = cx + vx * hb.w * CS / 2, y0 = cy + vy * hb.h * CS / 2, len = Math.abs(vx ? dx + dw / 2 - x0 : dy + dh / 2 - y0), ph = (tPlay * 110) % 44;
+    ctx.save(); ctx.fillStyle = 'rgba(255,255,255,.8)'; for (let d = ph; d < len; d += 44) { ctx.beginPath(); ctx.arc(x0 + vx * d, y0 + vy * d, 9, 0, 7); ctx.fill(); }
+    const pu = .5 + .5 * Math.sin(tPlay * 7); ctx.lineWidth = 8; ctx.strokeStyle = `rgba(255,255,255,${.4 + .6 * pu})`; rr(dx + 2, dy + 2, dw - 4, dh - 4, 10); ctx.stroke(); ctx.restore(); }
+  // animaux : ceux qui sortent passent au-dessus
+  const nudge = b => b === hb ? Math.max(0, Math.sin(tPlay * 7)) * .07 : 0;
+  blocks.filter(b => b.exitAt === null).forEach(b => drawBlock(b, tPlay, nudge(b)));
+  blocks.filter(b => b.exitAt !== null).forEach(b => drawBlock(b, tPlay));
+  // titre + HUD
+  ctx.save(); ctx.font = `900 84px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round'; ctx.lineWidth = 18; ctx.strokeStyle = STROKE;
+  ctx.strokeText('Tous à l’Enclos !', W / 2, 110); ctx.fillStyle = '#ffd166'; ctx.fillText('Tous à l’Enclos !', W / 2, 110); ctx.restore();
+  pill(60, 218, 330, 104, `Niveau ${levelIdx + 1}/3`);
+  for (let i = 0; i < 3; i++) { const lostNow = i === lives && tPlay - lifeAt < .4; heart(470 + i * 72, 276, lostNow ? 2 + Math.sin((tPlay - lifeAt) / .4 * Math.PI) * .8 : 2, i < lives); }
+  if (shown > coins) shown = coins;
+  if (shown < coins) shown = Math.min(coins, shown + 5);
+  const bb = tPlay - bumpAt; drawCounter(shown, bb >= 0 && bb < .3 ? Math.sin(bb / .3 * Math.PI) * .18 : 0, 270);
+  ctx.save(); ctx.font = `italic 600 40px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#7a6753'; ctx.fillText('Chaque animal a sa maison. Trouve l’ordre.', W / 2, 430); ctx.restore();
+  // +30
+  floats = floats.filter(f => tPlay - f[2] < .7);
+  for (const [x, y, t0] of floats) { const u = tw(tPlay, t0, t0 + .7); if (u <= 0) continue; if (u < .15) bumpAt = t0 + .2;
+    ctx.save(); ctx.globalAlpha = 1 - u; ctx.font = `bold 64px ${FONT}`; ctx.textAlign = 'center'; ctx.lineJoin = 'round'; ctx.lineWidth = 10; ctx.strokeStyle = STROKE;
+    ctx.strokeText('+' + GAIN, x + 20, y - 40 - u * 110); ctx.fillStyle = '#ffe66d'; ctx.fillText('+' + GAIN, x + 20, y - 40 - u * 110); drawCoin(x - 75, y - 62 - u * 110, 24); ctx.restore(); }
+  playX = playX.filter(k => tPlay - k[2] < .6); playX.forEach(([x, y, t0]) => drawX(x, y, tw(tPlay, t0, t0 + .3)));
+  playRipples = playRipples.filter(k => tPlay - k[2] < .45); playRipples.forEach(([x, y, t0]) => drawRipple(x, y, tw(tPlay, t0, t0 + .45)));
+  // aide : anneau sur un animal libre (au début, puis après 5 s sans action)
+  if (hb) { const [fx, fy] = centre(hb); const u = (tPlay * 1.2) % 1; ctx.save(); ctx.globalAlpha = 1 - u; ctx.lineWidth = 12; ctx.strokeStyle = '#fff'; ctx.beginPath(); ctx.arc(fx, fy, 60 + u * 70, 0, 7); ctx.stroke();
+    ctx.globalAlpha = 1; ctx.lineWidth = 8; ctx.strokeStyle = '#ffd166'; ctx.beginPath(); ctx.arc(fx, fy, 62, 0, 7); ctx.stroke(); ctx.restore(); }
+  // textes bas
+  const left = blocks.filter(present).length, total = blocks.length;
+  ctx.save(); ctx.font = `bold 44px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#7a6753'; ctx.fillText(`Animaux rentrés : ${total - left}/${total}`, W / 2, 1650); ctx.restore();
+  let line = !tapped ? 'Touche un animal : il file vers sa porte' : (levelIdx === 0 ? 'Fais rentrer tous les animaux' : 'Trouve le bon ordre !');
+  let col = '#5a4a3a';
+  if (msg && tPlay - msg[1] < 2.6) { line = msg[0]; col = '#c0392b'; }
+  ctx.save(); ctx.font = `bold 46px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = col; ctx.fillText(line, W / 2, 1765); ctx.restore();
+  if (lost !== null) { const a = tw(tPlay, lost, lost + .3) * .45; const g = ctx.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .75); g.addColorStop(0, 'rgba(230,57,70,0)'); g.addColorStop(1, `rgba(230,57,70,${a})`); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    drawBanner('Raté ! Réessaie', tw(tPlay, lost + .1, lost + .35), 1055); if (tPlay - lost > 1.2) { coins = coinsAtStart; startLevel(levelIdx); } return; }
+  // fin de niveau
+  if (won === null && blocks.every(b => b.exitAt !== null && tPlay > b.exitAt + EXIT_DUR)) { won = tPlay; track('DemoLevel' + (levelIdx + 1), { errors: blockedCount }); }
+  if (won !== null) { drawBanner(levelIdx === 2 ? 'Démo terminée !' : 'Niveau terminé !', tw(tPlay, won, won + .25), 1055);
+    if (tPlay - won > 1.0 && !ended) { if (levelIdx < 2) startLevel(levelIdx + 1); else endDemo(); } }
+}
+function endDemo() { ended = true; track('DemoDone', { coins, errors: blockedCount, fails });
+  document.getElementById('endtxt').textContent = `Tu as gagné ${coins} pièces et terminé la démo. Le jeu complet arrive bientôt sur Android, avec des centaines de niveaux et un zoo à remplir.`;
+  document.getElementById('end').style.display = 'flex'; }
+document.getElementById('again').onclick = () => { document.getElementById('end').style.display = 'none'; ended = false; coins = 0; shown = 0; startLevel(0); document.getElementById('cta').style.display = ''; document.getElementById('form').style.display = 'none'; };
+document.getElementById('cta').onclick = () => { track('DemoWant'); document.getElementById('cta').style.display = 'none'; document.getElementById('form').style.display = 'block'; };
+document.getElementById('f').onsubmit = e => { e.preventDefault(); if (window.onDemoEmail) window.onDemoEmail(e.target); else { document.getElementById('form').style.display = 'none'; document.getElementById('ok').style.display = 'block'; } };
+
+startLevel(0); let last = performance.now();
+function loop(now) { tPlay += Math.min(.05, (now - last) / 1000); last = now; render(); requestAnimationFrame(loop); }
+requestAnimationFrame(loop);
+cv.addEventListener('pointerdown', e => { e.preventDefault(); const r = cv.getBoundingClientRect(); onTap((e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height); });
+const playing = () => !ended && won === null && lost === null;
+window.__demo = { get blocks() { return blocks; }, onTap, get level() { return levelIdx; }, get ended() { return ended; }, get won() { return won; }, get lives() { return lives; }, get lost() { return lost; }, get coins() { return coins; },
+  autoMove() { if (!playing()) return null; const b = hintBlock(); return b ? centre(b) : null; },
+  badMove() { if (!playing()) return null; const b = stuckBlocks()[0]; return b ? centre(b) : null; },
+  adv(dt) { tPlay += dt; render(); } };
+</script>
+</body>
+</html>

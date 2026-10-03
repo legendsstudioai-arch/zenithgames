@@ -1,59 +1,311 @@
-<!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dévisse Tout ! — bientôt sur Android | ZenithGames Studio</title>
-<meta name="description" content="Dévisse les vis, libère les planches, rénove ton atelier. Des centaines de niveaux de réflexion.">
-<meta property="og:title" content="Dévisse Tout !"><meta property="og:description" content="Une vis à la fois. Le bon ordre."><meta property="og:image" content="https://legendsstudioai-arch.github.io/zenithgames/devisse-tout/poster.jpg">
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Dévisse Tout ! — joue à la démo | ZenithGames Studio</title>
 <style>
-:root{--acc:#e0563f}
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:#12101c;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center}
-header{padding:18px 16px 0;width:100%;max-width:520px;display:flex;align-items:center;gap:10px;color:#b9b3d1;font-size:14px}
-header .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#6b4fd8,#2fb8a8)}
-main{width:100%;max-width:520px;padding:14px 16px 40px;text-align:center}
-.phone{position:relative;width:min(60vw,236px);aspect-ratio:9/16;margin:8px auto 18px;border-radius:28px;overflow:hidden;background:#000;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 6px #23203a}
-.phone video{width:100%;height:100%;object-fit:cover;display:block}
-h1{font-size:30px;margin:4px 0 2px;line-height:1.1}
-.tag{color:var(--acc);font-weight:700;font-size:18px;margin:0 0 10px}
-p.desc{color:#cfc9e6;font-size:16px;line-height:1.45;margin:0 0 18px}
-.badge{display:inline-block;background:#23203a;color:#c9c3e3;border-radius:999px;padding:6px 14px;font-size:13px;margin:0 4px 18px}
-.btn{display:block;width:100%;border:0;border-radius:999px;background:#2ecc71;color:#fff;font-size:22px;font-weight:800;padding:18px;cursor:pointer;box-shadow:0 10px 30px rgba(46,204,113,.35);transition:transform .1s}
-.btn:active{transform:scale(.98)}
-#form{display:none;margin-top:16px;background:#1c1930;border-radius:18px;padding:18px}
-#form p{margin:0 0 10px;color:#e6e2f5}
-#form input[type=email]{width:100%;padding:14px;border-radius:12px;border:1px solid #3a3556;background:#12101c;color:#fff;font-size:16px;margin-bottom:10px}
-#form button{width:100%;border:0;border-radius:12px;background:var(--acc);color:#111;font-weight:800;font-size:17px;padding:14px;cursor:pointer}
-#ok{display:none;margin-top:16px;background:#183a2a;border-radius:18px;padding:18px;color:#bff3d3;font-weight:600}
-footer{color:#7f7899;font-size:12px;line-height:1.5;padding:0 16px 30px;max-width:520px;text-align:center}
-footer a{color:#a79fc9}
+  html,body{margin:0;height:100%;background:#2a221b;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+  #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  #c{display:block;width:min(100vw,calc(100dvh*9/16));height:auto;aspect-ratio:9/16;background:#d9cfc4;touch-action:none}
+  #end{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(30,22,15,.78);padding:20px;box-sizing:border-box}
+  #card{background:#fff8ee;border-radius:22px;padding:26px 22px;max-width:340px;width:100%;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+  #card h2{margin:0 0 6px;font-size:28px;color:#3a2a1c}
+  #card p{margin:8px 0 18px;font-size:16px;line-height:1.4;color:#5a4a3a}
+  .btn{display:block;width:100%;border:0;border-radius:16px;padding:16px;font-size:20px;font-weight:800;color:#fff;background:#e0563f;box-shadow:0 6px 0 #a83a28;cursor:pointer}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #a83a28}
+  .lnk{margin-top:16px;background:none;border:0;color:#8a7a6a;font-size:15px;text-decoration:underline;cursor:pointer}
+  #form{display:none;margin-top:4px}
+  #form input[type=email]{width:100%;box-sizing:border-box;padding:14px;font-size:17px;border:2px solid #d8c9b6;border-radius:12px;margin-bottom:10px}
+  #ok{display:none;font-weight:700;color:#2e7d32;font-size:17px}
 </style>
-<!-- Meta Pixel -->
+<meta name="description" content="Dévisse les vis, libère les planches. Joue à la démo gratuite.">
+<meta property="og:title" content="Dévisse Tout !"><meta property="og:description" content="Une vis à la fois. Le bon ordre."><meta property="og:image" content="https://legendsstudioai-arch.github.io/zenithgames/devisse-tout/poster.jpg">
 <script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-fbq('init','1102766998963847');fbq('track','PageView');</script>
-<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1102766998963847&ev=PageView&noscript=1"/></noscript>
-</head><body>
-<header><div class="logo"></div><div><strong style="color:#fff">ZenithGames Studio</strong><br>Jeu en développement — Android</div></header>
-<main>
-  <div class="phone"><video src="video.mp4" poster="poster.jpg" autoplay muted loop playsinline></video></div>
-  <h1>Dévisse Tout !</h1>
-  <p class="tag">Une vis à la fois. Le bon ordre.</p>
-  <p class="desc">Dévisse les vis, libère les planches, rénove ton atelier. Des centaines de niveaux de réflexion.</p>
-  <span class="badge">Gratuit</span><span class="badge">Android</span><span class="badge">Des centaines de niveaux</span>
-  <button class="btn" id="cta" onclick="want()">Je veux jouer</button>
-  <div id="form">
-    <p>Merci ! Laisse ton e-mail pour être prévenu à la sortie (et tester en avant-première).</p>
-    <form id="f" onsubmit="return send(event)">
-      <input type="hidden" name="jeu" value="Dévisse Tout !">
-      <input type="email" name="email" placeholder="ton@email.com" required>
-      <button type="submit">Prévenez-moi</button>
-    </form>
-  </div>
-  <div id="ok">C’est noté ! On te prévient dès que Dévisse Tout ! est disponible.</div>
-</main>
-<footer>Ton e-mail sert uniquement à te prévenir de la sortie du jeu ; il n’est ni partagé ni revendu. Cette page utilise le pixel Meta pour mesurer l’intérêt pour nos jeux.<br>Contact : <a href="mailto:legendsstudioai@gmail.com">legendsstudioai@gmail.com</a> · © ZenithGames Studio</footer>
-<script>
-function want(){ try{ fbq('track','Lead',{content_name:'devisse-tout'}); }catch(e){} document.getElementById('cta').style.display='none'; document.getElementById('form').style.display='block'; document.querySelector('#form input[type=email]').focus(); }
-async function send(e){ e.preventDefault(); const f=document.getElementById('f'); const b=f.querySelector('button'); b.disabled=true; b.textContent='Envoi…';
-  try{ const r=await fetch('https://formspree.io/f/xeaovldj',{method:'POST',headers:{'Accept':'application/json'},body:new FormData(f)}); if(!r.ok) throw 0;
-    try{ fbq('track','CompleteRegistration',{content_name:'devisse-tout'}); }catch(e){} document.getElementById('form').style.display='none'; document.getElementById('ok').style.display='block'; }
-  catch(err){ b.disabled=false; b.textContent='Réessayer'; alert('Envoi impossible, réessaie dans un instant.'); } return false; }
+fbq('init','1102766998963847');fbq('track','PageView');
+// suivi de la démo : événements standards (lisibles par campagne) + événement détaillé
+(function(){var S='devisse-tout',STD={DemoStart:'ViewContent',DemoLevel1:'AddToCart',DemoDone:'InitiateCheckout',DemoWant:'Lead'};
+window.onDemoEvent=function(n,d){try{var p={content_name:S};for(var k in (d||{}))p[k]=d[k];if(STD[n])fbq('track',STD[n],{content_name:S});fbq('trackCustom',n,p);}catch(e){}};
+window.onDemoEmail=function(f){var b=f.querySelector('button');b.disabled=true;b.textContent='Envoi…';
+fetch('https://formspree.io/f/xeaovldj',{method:'POST',headers:{'Accept':'application/json'},body:new FormData(f)}).then(function(r){if(!r.ok)throw 0;try{fbq('track','CompleteRegistration',{content_name:S});}catch(e){}document.getElementById('form').style.display='none';document.getElementById('ok').style.display='block';}).catch(function(){b.disabled=false;b.textContent='Réessayer';});};})();
 </script>
-</body></html>
+</head>
+<body>
+<div id="wrap"><canvas id="c" width="1080" height="1920"></canvas></div>
+<div id="end"><div id="card">
+  <h2>Bravo&nbsp;! 🎉</h2>
+  <p id="endtxt">Tu as terminé la démo. Le jeu complet arrive bientôt sur Android, avec des centaines de niveaux et des ateliers à rénover.</p>
+  <button class="btn" id="cta">Je veux le jeu complet</button>
+  <div id="form"><p>Laisse ton e-mail pour être prévenu à la sortie.</p>
+    <form id="f"><input type="hidden" name="jeu" value="Dévisse Tout ! (démo)"><input type="email" name="email" placeholder="ton@email.com" required><button class="btn" type="submit">Prévenez-moi</button></form></div>
+  <div id="ok">C’est noté ! On te prévient dès la sortie.</div>
+  <p style="font-size:11px;line-height:1.35;color:#9a8a7a;margin:14px 0 0">Ton e-mail sert uniquement à te prévenir de la sortie du jeu ; il n’est ni partagé ni revendu. Cette page utilise le pixel Meta pour mesurer l’intérêt pour nos jeux. Contact : legendsstudioai@gmail.com · © ZenithGames Studio</p>
+  <button class="lnk" id="again">Rejouer la démo</button>
+</div></div>
+<script>
+// Dévisse Tout ! — démo jouable 3 niveaux (page de test du concept)
+const W = 1080, H = 1920;
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif'; const STROKE = '#2b2b2b';
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const tw = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
+const easeOut = x => 1 - Math.pow(1 - x, 3);
+const easeIn = x => x * x * x;
+const easeInOut = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const REMOVE_DUR = 0.22;
+
+const COL = {
+  red: '#e0563f', blue: '#3f7fe0', green: '#4caf50', yellow: '#f2c14e', purple: '#9b59b6',
+  orange: '#f28c28', teal: '#1abc9c', pink: '#ff6f91', brown: '#a0522d', grey: '#95a5a6'
+};
+function shade(hex, k) { // k<0 darken, k>0 lighten
+  const n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  const f = c => clamp(Math.round(k < 0 ? c * (1 + k) : c + (255 - c) * k), 0, 255);
+  return `rgb(${f(r)},${f(g)},${f(b)})`;
+}
+
+// ---------- modèle ----------
+function plank(x, y, w, h, color, layer, screws) {
+  return { x, y, w, h, color, layer, screws: screws.map(([dx, dy]) => ({ dx, dy, removeAt: null })),
+           fallAt: null, swingAt: null, swingPivot: 0, swingAngle: 0, shakeAt: [], fallSpin: (Math.random() - .5) * 1.2 };
+}
+function plankState(p, t) {
+  let dx = 0, dy = 0, ang = 0, px = p.x + p.w / 2, py = p.y + p.h / 2, gone = false;
+  for (const s of p.shakeAt) { const d = t - s; if (d >= 0 && d < .5) dx += Math.sin(d * 60) * 12 * (1 - d / .5); }
+  if (p.swingAt !== null && t >= p.swingAt) {
+    const d = t - p.swingAt; const sc = p.screws[p.swingPivot];
+    px = p.x + sc.dx; py = p.y + sc.dy;
+    ang = p.swingAngle * (1 - Math.cos(d * 14) * Math.exp(-d * 6));
+  }
+  if (p.fallAt !== null && t >= p.fallAt) {
+    const d = t - p.fallAt; dy += 5200 * d * d; ang += p.fallSpin * d;
+    if (p.y + dy > H + 400) gone = true;
+  }
+  return { dx, dy, ang, px, py, gone };
+}
+function drawPlank(p, t) {
+  const st = plankState(p, t); if (st.gone) return;
+  ctx.save();
+  ctx.translate(st.px + st.dx, st.py + st.dy); ctx.rotate(st.ang); ctx.translate(-st.px, -st.py);
+  // ombre
+  ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 10;
+  rr(p.x, p.y, p.w, p.h, 18);
+  const horiz = p.w >= p.h;
+  const g = horiz ? ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.h) : ctx.createLinearGradient(p.x, p.y, p.x + p.w, p.y);
+  g.addColorStop(0, shade(p.color, .25)); g.addColorStop(.5, p.color); g.addColorStop(1, shade(p.color, -.25));
+  ctx.fillStyle = g; ctx.fill();
+  ctx.shadowColor = 'transparent';
+  // veines du bois
+  ctx.save(); rr(p.x, p.y, p.w, p.h, 18); ctx.clip();
+  ctx.strokeStyle = 'rgba(0,0,0,.14)'; ctx.lineWidth = 3;
+  for (let i = 1; i <= 3; i++) {
+    ctx.beginPath();
+    if (horiz) { const yy = p.y + p.h * i / 4; ctx.moveTo(p.x, yy); ctx.bezierCurveTo(p.x + p.w * .3, yy - 10, p.x + p.w * .6, yy + 12, p.x + p.w, yy - 4); }
+    else { const xx = p.x + p.w * i / 4; ctx.moveTo(xx, p.y); ctx.bezierCurveTo(xx - 10, p.y + p.h * .3, xx + 12, p.y + p.h * .6, xx - 4, p.y + p.h); }
+    ctx.stroke();
+  }
+  ctx.restore();
+  ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(0,0,0,.35)'; rr(p.x, p.y, p.w, p.h, 18); ctx.stroke();
+  // trous + vis
+  for (const s of p.screws) {
+    const sx = p.x + s.dx, sy = p.y + s.dy;
+    ctx.beginPath(); ctx.arc(sx, sy, 22, 0, 7); ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fill();
+    drawScrew(sx, sy, s, t);
+  }
+  ctx.restore();
+}
+function drawScrew(x, y, s, t) {
+  let rot = 0, rise = 0, alpha = 1, scale = 1;
+  if (s.removeAt !== null && t >= s.removeAt) {
+    const u = tw(t, s.removeAt, s.removeAt + REMOVE_DUR); if (u >= 1) return;
+    rot = u * 6 * Math.PI; scale = 1 + u * .25;
+    if (u > .6) { const v = (u - .6) / .4; rise = -v * 320; alpha = 1 - v; }
+  }
+  ctx.save(); ctx.globalAlpha = alpha; ctx.translate(x, y + rise); ctx.scale(scale, scale); ctx.rotate(rot);
+  const g = ctx.createRadialGradient(-8, -8, 4, 0, 0, 28);
+  g.addColorStop(0, '#f7f7f7'); g.addColorStop(.6, '#b8b8b8'); g.addColorStop(1, '#6e6e6e');
+  ctx.beginPath(); ctx.arc(0, 0, 26, 0, 7); ctx.fillStyle = g; ctx.fill();
+  ctx.lineWidth = 3; ctx.strokeStyle = '#3a3a3a'; ctx.stroke();
+  ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.strokeStyle = '#2f2f2f';
+  ctx.beginPath(); ctx.moveTo(-14, 0); ctx.lineTo(14, 0); ctx.moveTo(0, -14); ctx.lineTo(0, 14); ctx.stroke();
+  ctx.restore();
+}
+function rr(x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+
+// ---------- décor niveau ----------
+function drawBoard() {
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#e6ddd3'); g.addColorStop(1, '#cfc3b6');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.25)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 16;
+  rr(110, 380, 860, 1280, 40); ctx.fillStyle = '#bfb2a3'; ctx.fill(); ctx.restore();
+  rr(110, 380, 860, 1280, 40); ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(80,60,40,.35)'; ctx.stroke();
+}
+function drawLevel(planks, t) {
+  drawBoard();
+  [...planks].sort((a, b) => a.layer - b.layer).forEach(p => drawPlank(p, t));
+}
+
+function drawCoin(x, y, r) { ctx.save(); ctx.translate(x, y); const g = ctx.createRadialGradient(-r * .3, -r * .3, r * .2, 0, 0, r); g.addColorStop(0, '#fff3a0'); g.addColorStop(.6, '#f5c542'); g.addColorStop(1, '#c98a12');
+  ctx.beginPath(); ctx.arc(0, 0, r, 0, 7); ctx.fillStyle = g; ctx.fill(); ctx.lineWidth = r * .12; ctx.strokeStyle = '#8a5a00'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, r * .62, 0, 7); ctx.stroke(); ctx.restore(); }
+function drawCounter(value, bump = 0, cy = 330) { ctx.save(); ctx.translate(W - 60, cy); ctx.scale(1 + bump, 1 + bump);
+  ctx.beginPath(); rr(-330, -52, 330, 104, 52); ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.fill();
+  drawCoin(-270, 0, 40); ctx.font = `bold 64px ${FONT}`; ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff'; ctx.fillText(String(value), -40, 4); ctx.restore(); }
+function drawRipple(x, y, u) {
+  if (u <= 0 || u >= 1) return;
+  ctx.save(); ctx.globalAlpha = (1 - u) * .8; ctx.lineWidth = 10; ctx.strokeStyle = '#fff';
+  ctx.beginPath(); ctx.arc(x, y, 25 + u * 110, 0, 7); ctx.stroke(); ctx.restore();
+}
+function drawX(x, y, u) {
+  if (u <= 0) return; const s = back(clamp(u * 3, 0, 1));
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.lineWidth = 18; ctx.lineCap = 'round'; ctx.strokeStyle = '#e63946';
+  ctx.shadowColor = 'rgba(0,0,0,.3)'; ctx.shadowBlur = 10;
+  ctx.beginPath(); ctx.moveTo(-40, -40); ctx.lineTo(40, 40); ctx.moveTo(40, -40); ctx.lineTo(-40, 40); ctx.stroke(); ctx.restore();
+}
+function drawBanner(text, u, y = 230, size = 96) {
+  if (u <= 0) return; const s = .6 + .4 * back(clamp(u, 0, 1)); const lines = text.split('\n'); if (lines.length > 1) size = 80;
+  ctx.save(); ctx.translate(W / 2, y + (lines.length - 1) * 30); ctx.scale(s, s);
+  ctx.font = `bold ${size}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  lines.forEach((ln, i) => { const yy = (i - (lines.length - 1) / 2) * size * 1.15;
+    ctx.save(); ctx.lineJoin = 'round'; ctx.lineWidth = 22; ctx.strokeStyle = STROKE; ctx.strokeText(ln, 0, yy);
+    ctx.shadowColor = 'rgba(0,0,0,.4)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 6; ctx.fillStyle = '#fff'; ctx.fillText(ln, 0, yy); ctx.restore(); });
+  ctx.restore();
+}
+function level1() {
+  return [
+    plank(200, 450, 680, 110, COL.orange, 4, [[340, 55]]),
+    plank(200, 700, 680, 110, COL.red, 3, [[340, 55]]),
+    plank(300, 560, 110, 600, COL.blue, 2, [[55, 60], [55, 540]]),
+    plank(660, 560, 110, 600, COL.green, 2, [[55, 60], [55, 540]]),
+    plank(200, 950, 680, 110, COL.yellow, 1, [[205, 55], [465, 55]]),
+    plank(200, 1200, 680, 110, COL.purple, 0, [[60, 55], [620, 55]]),
+  ];
+}
+// ---------- niveaux ----------
+function level2() {
+  return [
+    plank(180, 470, 720, 100, COL.pink, 6, [[60, 50], [660, 50]]),
+    plank(240, 430, 100, 760, COL.blue, 4, [[50, 60], [50, 700]]),
+    plank(740, 430, 100, 760, COL.green, 4, [[50, 60], [50, 700]]),
+    plank(180, 760, 720, 100, COL.yellow, 2, [[110, 50], [610, 50]]),
+    plank(180, 1080, 720, 100, COL.orange, 5, [[60, 50], [660, 50]]),
+    plank(490, 600, 100, 900, COL.purple, 1, [[50, 210], [50, 530]]),
+    plank(180, 1400, 720, 100, COL.teal, 0, [[60, 50], [360, 50]]),
+    plank(330, 1250, 420, 90, COL.brown, 7, [[45, 45], [375, 45]]),
+  ];
+}
+function level3() {
+  return [
+    plank(380, 430, 320, 90, COL.pink, 12, [[45, 45], [275, 45]]),
+    plank(490, 400, 100, 1180, COL.purple, 11, [[50, 114], [50, 1056]]),
+    plank(180, 560, 720, 100, COL.red, 10, [[60, 50], [316, 50]]),
+    plank(200, 520, 100, 820, COL.blue, 9, [[50, 134], [50, 660]]),
+    plank(780, 520, 100, 820, COL.green, 9, [[50, 134], [50, 660]]),
+    plank(180, 820, 720, 100, COL.yellow, 8, [[114, 50], [606, 50]]),
+    plank(180, 1230, 720, 100, COL.orange, 7, [[114, 50], [606, 50]]),
+    plank(340, 700, 100, 860, COL.teal, 6, [[50, 214], [50, 536]]),
+    plank(640, 700, 100, 860, COL.brown, 6, [[50, 214], [50, 536]]),
+    plank(180, 1010, 720, 100, COL.grey, 5, [[254, 50], [466, 50]]),
+    plank(400, 1450, 280, 90, COL.red, 13, [[45, 45], [235, 45]]),
+    plank(180, 1420, 720, 100, COL.blue, 4, [[360, 50], [480, 50]]),
+  ];
+}
+const LEVELS = [level1, level2, level3];
+const GAIN = 30;
+
+// ---------- suivi (branché sur le pixel à l'intégration) ----------
+const sent = {};
+function track(name, data) { if (sent[name]) return; sent[name] = 1; try { if (window.onDemoEvent) window.onDemoEvent(name, data || {}); } catch (e) {} }
+
+// ---------- état ----------
+let planks, levelIdx = 0, tPlay = 0, playX = [], playRipples = [], floats = [], won = null, coins = 0, shown = 0, bumpAt = -9;
+let lastTap = 0, tapped = false, msg = null, ended = false, blockedCount = 0, lives = 3, lost = null, coinsAtStart = 0, fails = 0, lifeAt = -9;
+function startLevel(i) { levelIdx = i; planks = LEVELS[i](); won = null; lost = null; lives = 3; coinsAtStart = coins; lastTap = tPlay; msg = null; playX = []; floats = []; }
+function present(q) { return q.fallAt === null; }
+function covered(pl, x, y) {
+  return planks.some(q => q !== pl && q.layer > pl.layer && present(q) && x >= q.x && x <= q.x + q.w && y >= q.y && y <= q.y + q.h);
+}
+function freeScrews() {
+  const out = [];
+  for (const p of planks) { if (!present(p)) continue;
+    for (const s of p.screws) { if (s.removeAt !== null) continue; const sx = p.x + s.dx, sy = p.y + s.dy; out.push({ p, s, sx, sy, cov: covered(p, sx, sy) }); } }
+  return out;
+}
+function onTap(x, y) {
+  if (ended || won !== null || lost !== null) return;
+  playRipples.push([x, y, tPlay]); lastTap = tPlay;
+  if (!tapped) { tapped = true; track('DemoStart'); }
+  const all = freeScrews().map(k => ({ ...k, d: Math.hypot(x - k.sx, y - k.sy) }));
+  // vis cachée entièrement sous une planche = intouchable ; sinon la plus proche du doigt l'emporte
+  const vis = k => !k.cov || !planks.some(q => q !== k.p && q.layer > k.p.layer && present(q) && k.sx - 20 >= q.x && k.sx + 20 <= q.x + q.w && k.sy - 20 >= q.y && k.sy + 20 <= q.y + q.h);
+  const near = all.filter(k => k.d < (k.cov ? 52 : 82) && vis(k)).sort((a, b) => a.d - b.d)[0];
+  let hit = near && !near.cov ? near : null;
+  if (!hit) {
+    const bl = near;
+    if (bl) { bl.p.shakeAt.push(tPlay); playX.push([bl.sx, bl.sy, tPlay]); blockedCount++; lives--; lifeAt = tPlay; msg = ['Vis coincée sous une planche !', tPlay]; if (lives <= 0) { lost = tPlay; fails++; track('DemoFail' + (levelIdx + 1)); } }
+    return;
+  }
+  const { p, s } = hit; s.removeAt = tPlay;
+  const left = p.screws.filter(k => k.removeAt === null);
+  if (left.length === 0) { p.fallAt = tPlay + REMOVE_DUR; p.fallSpin = (Math.random() - .5) * 1.2;
+    floats.push([p.x + p.w / 2, p.y + p.h / 2, tPlay + REMOVE_DUR]); coins += GAIN; }
+  else if (left.length === 1 && p.swingAt === null) { p.swingAt = tPlay + REMOVE_DUR; p.swingPivot = p.screws.indexOf(left[0]);
+    p.swingAngle = p.w > p.h ? (left[0].dx > p.w / 2 ? -1 : 1) * .13 : (Math.random() < .5 ? -1 : 1) * .07; }
+}
+function pill(x, y, w, h, text) { ctx.save(); rr(x, y, w, h, h / 2); ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.fill();
+  ctx.font = `bold 52px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff'; ctx.fillText(text, x + w / 2, y + h / 2 + 3); ctx.restore(); }
+function heart(x, y, s, on) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.beginPath(); ctx.moveTo(0, 12); ctx.bezierCurveTo(-34, -14, -16, -36, 0, -16); ctx.bezierCurveTo(16, -36, 34, -14, 0, 12); ctx.closePath();
+  ctx.fillStyle = on ? '#e63946' : 'rgba(0,0,0,.22)'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = on ? '#8f1d27' : 'rgba(0,0,0,.25)'; ctx.stroke(); ctx.restore(); }
+function render() {
+  ctx.clearRect(0, 0, W, H); drawLevel(planks, tPlay);
+  // titre + HUD
+  ctx.save(); ctx.font = `900 84px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round'; ctx.lineWidth = 18; ctx.strokeStyle = STROKE;
+  ctx.strokeText('Dévisse Tout !', W / 2, 110); ctx.fillStyle = '#ffd166'; ctx.fillText('Dévisse Tout !', W / 2, 110); ctx.restore();
+  pill(60, 218, 330, 104, `Niveau ${levelIdx + 1}/3`);
+  for (let i = 0; i < 3; i++) { const lostNow = i === lives && tPlay - lifeAt < .4; heart(470 + i * 72, 276, lostNow ? 2 + Math.sin((tPlay - lifeAt) / .4 * Math.PI) * .8 : 2, i < lives); }
+  if (shown > coins) shown = coins;
+  if (shown < coins) shown = Math.min(coins, shown + 5);
+  const b = tPlay - bumpAt; drawCounter(shown, b >= 0 && b < .3 ? Math.sin(b / .3 * Math.PI) * .18 : 0, 270);
+  // +30
+  floats = floats.filter(f => tPlay - f[2] < .7);
+  for (const [x, y, t0] of floats) { const u = tw(tPlay, t0, t0 + .7); if (u <= 0) continue; if (u < .15) bumpAt = t0 + .2;
+    ctx.save(); ctx.globalAlpha = 1 - u; ctx.font = `bold 64px ${FONT}`; ctx.textAlign = 'center'; ctx.lineJoin = 'round'; ctx.lineWidth = 10; ctx.strokeStyle = STROKE;
+    ctx.strokeText('+' + GAIN, x, y - 40 - u * 110); ctx.fillStyle = '#ffe66d'; ctx.fillText('+' + GAIN, x, y - 40 - u * 110); drawCoin(x - 95, y - 62 - u * 110, 24); ctx.restore(); }
+  playX = playX.filter(k => tPlay - k[2] < .55); playX.forEach(([x, y, t0]) => drawX(x, y, tw(tPlay, t0, t0 + .3)));
+  playRipples = playRipples.filter(k => tPlay - k[2] < .45); playRipples.forEach(([x, y, t0]) => drawRipple(x, y, tw(tPlay, t0, t0 + .45)));
+  // aide : anneau sur une vis libre (au début, puis après 5 s sans action)
+  if (won === null && lost === null && (!tapped || tPlay - lastTap > 5)) {
+    const f = freeScrews().filter(k => !k.cov).sort((a, b) => b.p.layer - a.p.layer)[0];
+    if (f) { const u = (tPlay * 1.2) % 1; ctx.save(); ctx.globalAlpha = 1 - u; ctx.lineWidth = 12; ctx.strokeStyle = '#fff'; ctx.beginPath(); ctx.arc(f.sx, f.sy, 34 + u * 60, 0, 7); ctx.stroke();
+      ctx.globalAlpha = 1; ctx.lineWidth = 8; ctx.strokeStyle = '#ffd166'; ctx.beginPath(); ctx.arc(f.sx, f.sy, 36, 0, 7); ctx.stroke(); ctx.restore(); }
+  }
+  // texte bas
+  let line = !tapped ? 'Touche une vis pour la dévisser' : (levelIdx === 0 ? 'Fais tomber toutes les planches' : 'Trouve le bon ordre !');
+  let col = '#5a4a3a';
+  if (msg && tPlay - msg[1] < 2.6) { line = msg[0]; col = '#c0392b'; }
+  ctx.save(); ctx.font = `bold 46px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = col; ctx.fillText(line, W / 2, 1765); ctx.restore();
+  if (lost !== null) { const a = tw(tPlay, lost, lost + .3) * .45; const g = ctx.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .75); g.addColorStop(0, 'rgba(230,57,70,0)'); g.addColorStop(1, `rgba(230,57,70,${a})`); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    drawBanner('Raté ! Réessaie', tw(tPlay, lost + .1, lost + .35), 960); if (tPlay - lost > 1.2) { coins = coinsAtStart; startLevel(levelIdx); } return; }
+  // fin de niveau
+  if (won === null && planks.every(p => p.fallAt !== null && tPlay > p.fallAt + .3)) { won = tPlay; track('DemoLevel' + (levelIdx + 1), { errors: blockedCount }); }
+  if (won !== null) { drawBanner(levelIdx === 2 ? 'Démo terminée !' : 'Niveau terminé !', tw(tPlay, won, won + .25), 960);
+    if (tPlay - won > 1.0 && !ended) { if (levelIdx < 2) startLevel(levelIdx + 1); else endDemo(); } }
+}
+function endDemo() { ended = true; track('DemoDone', { coins, errors: blockedCount, fails });
+  document.getElementById('endtxt').textContent = `Tu as gagné ${coins} pièces et terminé la démo. Le jeu complet arrive bientôt sur Android, avec des centaines de niveaux et des ateliers à rénover.`;
+  document.getElementById('end').style.display = 'flex'; }
+document.getElementById('again').onclick = () => { document.getElementById('end').style.display = 'none'; ended = false; coins = 0; shown = 0; startLevel(0); document.getElementById('cta').style.display = ''; document.getElementById('form').style.display = 'none'; };
+document.getElementById('cta').onclick = () => { track('DemoWant'); document.getElementById('cta').style.display = 'none'; document.getElementById('form').style.display = 'block'; };
+document.getElementById('f').onsubmit = e => { e.preventDefault(); if (window.onDemoEmail) window.onDemoEmail(e.target); else { document.getElementById('form').style.display = 'none'; document.getElementById('ok').style.display = 'block'; } };
+
+startLevel(0); let last = performance.now();
+function loop(now) { tPlay += Math.min(.05, (now - last) / 1000); last = now; render(); requestAnimationFrame(loop); }
+requestAnimationFrame(loop);
+cv.addEventListener('pointerdown', e => { e.preventDefault(); const r = cv.getBoundingClientRect(); onTap((e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height); });
+window.__demo = { get planks() { return planks; }, freeScrews, onTap, get level() { return levelIdx; }, get ended() { return ended; }, get won() { return won; }, get lives() { return lives; }, get lost() { return lost; }, adv(dt) { tPlay += dt; render(); } };
+</script>
+</body>
+</html>

@@ -1,59 +1,279 @@
-<!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Crack le Coffre — bientôt sur Android | ZenithGames Studio</title>
-<meta name="description" content="Tourne les anneaux, aligne les symboles, ouvre le coffre avant la fin des coups.">
-<meta property="og:title" content="Crack le Coffre"><meta property="og:description" content="Tourne. Aligne. Ouvre."><meta property="og:image" content="https://legendsstudioai-arch.github.io/zenithgames/crack-le-coffre/poster.jpg">
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Crack le Coffre — joue à la démo | ZenithGames Studio</title>
 <style>
-:root{--acc:#f5c542}
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:#12101c;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center}
-header{padding:18px 16px 0;width:100%;max-width:520px;display:flex;align-items:center;gap:10px;color:#b9b3d1;font-size:14px}
-header .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#6b4fd8,#2fb8a8)}
-main{width:100%;max-width:520px;padding:14px 16px 40px;text-align:center}
-.phone{position:relative;width:min(60vw,236px);aspect-ratio:9/16;margin:8px auto 18px;border-radius:28px;overflow:hidden;background:#000;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 6px #23203a}
-.phone video{width:100%;height:100%;object-fit:cover;display:block}
-h1{font-size:30px;margin:4px 0 2px;line-height:1.1}
-.tag{color:var(--acc);font-weight:700;font-size:18px;margin:0 0 10px}
-p.desc{color:#cfc9e6;font-size:16px;line-height:1.45;margin:0 0 18px}
-.badge{display:inline-block;background:#23203a;color:#c9c3e3;border-radius:999px;padding:6px 14px;font-size:13px;margin:0 4px 18px}
-.btn{display:block;width:100%;border:0;border-radius:999px;background:#2ecc71;color:#fff;font-size:22px;font-weight:800;padding:18px;cursor:pointer;box-shadow:0 10px 30px rgba(46,204,113,.35);transition:transform .1s}
-.btn:active{transform:scale(.98)}
-#form{display:none;margin-top:16px;background:#1c1930;border-radius:18px;padding:18px}
-#form p{margin:0 0 10px;color:#e6e2f5}
-#form input[type=email]{width:100%;padding:14px;border-radius:12px;border:1px solid #3a3556;background:#12101c;color:#fff;font-size:16px;margin-bottom:10px}
-#form button{width:100%;border:0;border-radius:12px;background:var(--acc);color:#111;font-weight:800;font-size:17px;padding:14px;cursor:pointer}
-#ok{display:none;margin-top:16px;background:#183a2a;border-radius:18px;padding:18px;color:#bff3d3;font-weight:600}
-footer{color:#7f7899;font-size:12px;line-height:1.5;padding:0 16px 30px;max-width:520px;text-align:center}
-footer a{color:#a79fc9}
+  html,body{margin:0;height:100%;background:#14161c;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+  #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  #c{display:block;width:min(100vw,calc(100dvh*9/16));height:auto;aspect-ratio:9/16;background:#2a2e38;touch-action:none}
+  #end{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(12,13,18,.8);padding:20px;box-sizing:border-box}
+  #card{background:#fff8ee;border-radius:22px;padding:26px 22px;max-width:340px;width:100%;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+  #card h2{margin:0 0 6px;font-size:28px;color:#3a2a1c}
+  #card p{margin:8px 0 18px;font-size:16px;line-height:1.4;color:#5a4a3a}
+  .btn{display:block;width:100%;border:0;border-radius:16px;padding:16px;font-size:20px;font-weight:800;color:#2b2110;background:#f5c542;box-shadow:0 6px 0 #b8860b;cursor:pointer}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #b8860b}
+  .lnk{margin-top:16px;background:none;border:0;color:#8a7a6a;font-size:15px;text-decoration:underline;cursor:pointer}
+  #form{display:none;margin-top:4px}
+  #form input[type=email]{width:100%;box-sizing:border-box;padding:14px;font-size:17px;border:2px solid #d8c9b6;border-radius:12px;margin-bottom:10px}
+  #ok{display:none;font-weight:700;color:#2e7d32;font-size:17px}
 </style>
-<!-- Meta Pixel -->
+<meta name="description" content="Tourne les anneaux et ouvre le coffre. Joue à la démo gratuite.">
+<meta property="og:title" content="Crack le Coffre"><meta property="og:description" content="Tourne. Aligne. Ouvre."><meta property="og:image" content="https://legendsstudioai-arch.github.io/zenithgames/crack-le-coffre/poster.jpg">
 <script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-fbq('init','1102766998963847');fbq('track','PageView');</script>
-<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1102766998963847&ev=PageView&noscript=1"/></noscript>
-</head><body>
-<header><div class="logo"></div><div><strong style="color:#fff">ZenithGames Studio</strong><br>Jeu en développement — Android</div></header>
-<main>
-  <div class="phone"><video src="video.mp4" poster="poster.jpg" autoplay muted loop playsinline></video></div>
-  <h1>Crack le Coffre</h1>
-  <p class="tag">Tourne. Aligne. Ouvre.</p>
-  <p class="desc">Tourne les anneaux, aligne les symboles, ouvre le coffre avant la fin des coups.</p>
-  <span class="badge">Gratuit</span><span class="badge">Android</span><span class="badge">Des centaines de niveaux</span>
-  <button class="btn" id="cta" onclick="want()">Je veux jouer</button>
-  <div id="form">
-    <p>Merci ! Laisse ton e-mail pour être prévenu à la sortie (et tester en avant-première).</p>
-    <form id="f" onsubmit="return send(event)">
-      <input type="hidden" name="jeu" value="Crack le Coffre">
-      <input type="email" name="email" placeholder="ton@email.com" required>
-      <button type="submit">Prévenez-moi</button>
-    </form>
-  </div>
-  <div id="ok">C’est noté ! On te prévient dès que Crack le Coffre est disponible.</div>
-</main>
-<footer>Ton e-mail sert uniquement à te prévenir de la sortie du jeu ; il n’est ni partagé ni revendu. Cette page utilise le pixel Meta pour mesurer l’intérêt pour nos jeux.<br>Contact : <a href="mailto:legendsstudioai@gmail.com">legendsstudioai@gmail.com</a> · © ZenithGames Studio</footer>
-<script>
-function want(){ try{ fbq('track','Lead',{content_name:'crack-le-coffre'}); }catch(e){} document.getElementById('cta').style.display='none'; document.getElementById('form').style.display='block'; document.querySelector('#form input[type=email]').focus(); }
-async function send(e){ e.preventDefault(); const f=document.getElementById('f'); const b=f.querySelector('button'); b.disabled=true; b.textContent='Envoi…';
-  try{ const r=await fetch('https://formspree.io/f/xeaovldj',{method:'POST',headers:{'Accept':'application/json'},body:new FormData(f)}); if(!r.ok) throw 0;
-    try{ fbq('track','CompleteRegistration',{content_name:'crack-le-coffre'}); }catch(e){} document.getElementById('form').style.display='none'; document.getElementById('ok').style.display='block'; }
-  catch(err){ b.disabled=false; b.textContent='Réessayer'; alert('Envoi impossible, réessaie dans un instant.'); } return false; }
+fbq('init','1102766998963847');fbq('track','PageView');
+// suivi de la démo : événements standards (lisibles par campagne) + événement détaillé
+(function(){var S='crack-le-coffre',STD={DemoStart:'ViewContent',DemoLevel1:'AddToCart',DemoDone:'InitiateCheckout',DemoWant:'Lead'};
+window.onDemoEvent=function(n,d){try{var p={content_name:S};for(var k in (d||{}))p[k]=d[k];if(STD[n])fbq('track',STD[n],{content_name:S});fbq('trackCustom',n,p);}catch(e){}};
+window.onDemoEmail=function(f){var b=f.querySelector('button');b.disabled=true;b.textContent='Envoi…';
+fetch('https://formspree.io/f/xeaovldj',{method:'POST',headers:{'Accept':'application/json'},body:new FormData(f)}).then(function(r){if(!r.ok)throw 0;try{fbq('track','CompleteRegistration',{content_name:S});}catch(e){}document.getElementById('form').style.display='none';document.getElementById('ok').style.display='block';}).catch(function(){b.disabled=false;b.textContent='Réessayer';});};})();
 </script>
-</body></html>
+</head>
+<body>
+<div id="wrap"><canvas id="c" width="1080" height="1920"></canvas></div>
+<div id="end"><div id="card">
+  <h2>Bravo&nbsp;! 🎉</h2>
+  <p id="endtxt">Tu as terminé la démo. Le jeu complet arrive bientôt sur Android, avec des centaines de coffres à ouvrir et un musée du butin à remplir.</p>
+  <button class="btn" id="cta">Je veux le jeu complet</button>
+  <div id="form"><p>Laisse ton e-mail pour être prévenu à la sortie.</p>
+    <form id="f"><input type="hidden" name="jeu" value="Crack le Coffre (démo)"><input type="email" name="email" placeholder="ton@email.com" required><button class="btn" type="submit">Prévenez-moi</button></form></div>
+  <div id="ok">C’est noté ! On te prévient dès la sortie.</div>
+  <p style="font-size:11px;line-height:1.35;color:#9a8a7a;margin:14px 0 0">Ton e-mail sert uniquement à te prévenir de la sortie du jeu ; il n’est ni partagé ni revendu. Cette page utilise le pixel Meta pour mesurer l’intérêt pour nos jeux. Contact : legendsstudioai@gmail.com · © ZenithGames Studio</p>
+  <button class="lnk" id="again">Rejouer la démo</button>
+</div></div>
+<script>
+// Crack le Coffre — démo jouable 3 niveaux (page de test du concept). « Tourne. Aligne. Ouvre. »
+const W = 1080, H = 1920;
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif'; const STROKE = '#1a1a22';
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const tw = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
+const easeOut = x => 1 - Math.pow(1 - x, 3);
+const easeIn = x => x * x * x;
+const easeInOut = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const COL = { red: '#e74c3c', blue: '#3b82f6', green: '#22c55e', yellow: '#f5c542', purple: '#a855f7', orange: '#f97316' };
+function shade(hex, k) { const n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  const f = c => clamp(Math.round(k < 0 ? c * (1 + k) : c + (255 - c) * k), 0, 255); return `rgb(${f(r)},${f(g)},${f(b)})`; }
+function rr(x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+
+// ---------- modèle (repris de la scène pub : anneaux concentriques, 6 secteurs) ----------
+const NS = 6, CX = 540, CY = 1050, RDOOR = 520, RIM = 52;
+const BASE = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
+const ROT_DUR = .18;
+// niveau : offs = décalage initial de chaque anneau (0 = centre) ; links [a,b] = toucher a fait aussi tourner b ; moves = budget de coups
+// anneaux indépendants (liaisons retirées pour la démo). Optimal : 2 / 5 / 6 — budgets : 8 / 7 / 8
+const LEVELS = [
+  { r0: 170, offs: [0, 4], links: [], moves: 8 },
+  { r0: 140, offs: [0, 3, 4], links: [], moves: 7 },
+  { r0: 110, offs: [3, 0, 5, 4], links: [], moves: 8, hex: true },
+];
+const LINK_ANG = [0, 2 * Math.PI / 3, -2 * Math.PI / 3]; // frontières de secteurs : les liens ne masquent pas les gemmes
+const TAP_ANG = Math.PI / 6;
+let RINGS = [], ROTS = [], R0 = 150, RW = 78, LINKS = [], MOVES0 = 0, OPEN_AT = null, ALARM_AT = null;
+function moveVec(L, i) { const v = L.offs.map(() => 0); v[i] = 1; for (const [a, b] of L.links) if (a === i) v[b] = 1; return v; }
+let HEX = false; const C30 = Math.cos(Math.PI / 6);
+// coffre hexagonal : sommets aux frontières de secteurs (angles k·60° + rot), rayon = distance centre → sommet
+function hexPath(R, rot = 0) { ctx.beginPath(); for (let k = 0; k < 6; k++) { const a = k * Math.PI / 3 + rot; ctx.lineTo(CX + Math.cos(a) * R, CY + Math.sin(a) * R); } ctx.closePath(); }
+function shapePath(R, rot = 0) { if (HEX) hexPath(R, rot); else { ctx.beginPath(); ctx.arc(CX, CY, R, 0, 7); } }
+const aligned = o => o.every(x => ((x - o[0]) % NS + NS) % NS === 0);
+const stepState = (o, v) => o.map((x, i) => (x + v[i]) % NS);
+const keyOf = o => o.map(x => ((x - o[0]) % NS + NS) % NS).join('');
+function distOf(L, o) { // BFS : nombre minimal de coups pour aligner
+  if (aligned(o)) return 0; const vs = L.offs.map((_, i) => moveVec(L, i));
+  let fr = [o], seen = new Set([keyOf(o)]), d = 0;
+  while (fr.length) { d++; const nx = [];
+    for (const s of fr) for (const v of vs) { const t = stepState(s, v); if (aligned(t)) return d; const k = keyOf(t); if (!seen.has(k)) { seen.add(k); nx.push(t); } }
+    fr = nx; }
+  return Infinity;
+}
+function simRandom(li, trials) { const L = LEVELS[li]; let win = 0;
+  for (let n = 0; n < trials; n++) { let o = L.offs.slice();
+    for (let m = 0; m < L.moves; m++) { o = stepState(o, moveVec(L, Math.floor(Math.random() * o.length))); if (aligned(o)) { win++; break; } } }
+  return win / trials; }
+function offsetAt(i, t) { // décalage (float) de l'anneau i à l'instant t
+  let o = RINGS[i].off;
+  for (const r of ROTS) { if (r.ring !== i) continue; if (t >= r.t + ROT_DUR) o += r.d; else if (t >= r.t) o += r.d * easeInOut(tw(t, r.t, r.t + ROT_DUR)); }
+  return o;
+}
+function intOffsets(t) { return RINGS.map((_, i) => { let o = RINGS[i].off; for (const r of ROTS) if (r.ring === i && t >= r.t + ROT_DUR) o += r.d; return o; }); }
+const colorAt = (i, k, o) => RINGS[i].seq[(((k - o) % NS) + NS) % NS];
+function alignedSpokes(t) { const offs = intOffsets(t); const res = [];
+  for (let k = 0; k < NS; k++) { const c0 = colorAt(0, k, offs[0]); res.push(RINGS.every((_, i) => colorAt(i, k, offs[i]) === c0)); } return res; }
+const ringMid = i => R0 + i * RW + (RW - 8) / 2;
+
+// ---------- dessin (repris de la scène pub) ----------
+function drawVaultBg() { const g = ctx.createRadialGradient(CX, CY, 100, CX, CY, 1300); g.addColorStop(0, '#3a3f4b'); g.addColorStop(1, '#14161c'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = 'rgba(255,255,255,.06)'; for (let y = 120; y < H; y += 160) for (let x = 60; x < W; x += 160) { ctx.beginPath(); ctx.arc(x, y, 8, 0, 7); ctx.fill(); } }
+function drawGem(color, x, y, r, ang) { ctx.save(); ctx.translate(x, y); ctx.rotate(ang);
+  ctx.beginPath(); ctx.moveTo(0, -r); ctx.lineTo(r * .8, 0); ctx.lineTo(0, r); ctx.lineTo(-r * .8, 0); ctx.closePath();
+  const g = ctx.createLinearGradient(-r, -r, r, r); g.addColorStop(0, shade(COL[color], .5)); g.addColorStop(.5, COL[color]); g.addColorStop(1, shade(COL[color], -.35)); ctx.fillStyle = g; ctx.fill();
+  ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,.65)'; ctx.stroke(); ctx.beginPath(); ctx.moveTo(-r * .8, 0); ctx.lineTo(r * .8, 0); ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.stroke(); ctx.restore(); }
+function drawDoor(t, openU) {
+  const R = RDOOR;
+  ctx.save();
+  if (openU > 0) { const sx = Math.max(.04, 1 - openU); ctx.translate(CX - R, CY); ctx.scale(sx, 1); ctx.translate(-(CX - R), -CY); ctx.globalAlpha = 1; }
+  // corps de la porte
+  ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.6)'; ctx.shadowBlur = 60; ctx.shadowOffsetX = 20 + openU * 200; const g = ctx.createRadialGradient(CX - 200, CY - 200, 50, CX, CY, R); g.addColorStop(0, '#8a919e'); g.addColorStop(1, '#3d434e');
+  shapePath(R); ctx.fillStyle = g; ctx.fill(); ctx.restore();
+  ctx.lineWidth = 14; ctx.lineJoin = 'round'; ctx.strokeStyle = '#22252c'; shapePath(R - 7); ctx.stroke();
+  for (let k = 0; k < 12; k++) { const a = k * Math.PI / 6 + Math.PI / 12; const rb = HEX ? (R * C30 - 30) / Math.cos(Math.PI / 12) : R - 32; ctx.fillStyle = '#c9ced8'; ctx.beginPath(); ctx.arc(CX + Math.cos(a) * rb, CY + Math.sin(a) * rb, 10, 0, 7); ctx.fill(); }
+  const al = alignedSpokes(t); const offs = intOffsets(t);
+  // anneaux
+  RINGS.forEach((ring, i) => { const rin = R0 + i * RW, rout = rin + RW - 8; const o = offsetAt(i, t);
+    const rot = ROTS.find(r => r.ring === i && t >= r.t && t < r.t + ROT_DUR + .12); const rotating = !!rot;
+    for (let k = 0; k < NS; k++) { const a0 = (k + o) * 2 * Math.PI / NS - Math.PI / 2 - Math.PI / NS + .03, a1 = a0 + 2 * Math.PI / NS - .06;
+      if (HEX) { const b0 = (k + o) * Math.PI / 3 - Math.PI / 2 - Math.PI / 6, b1 = b0 + Math.PI / 3; const P = (r, b) => [CX + Math.cos(b) * r, CY + Math.sin(b) * r]; const mix = (A, B, u) => [A[0] + (B[0] - A[0]) * u, A[1] + (B[1] - A[1]) * u];
+        const O0 = P(rout, b0), O1 = P(rout, b1), I0 = P(rin, b0), I1 = P(rin, b1), g0 = .035; ctx.beginPath(); ctx.moveTo(...mix(O0, O1, g0)); ctx.lineTo(...mix(O0, O1, 1 - g0)); ctx.lineTo(...mix(I0, I1, 1 - g0)); ctx.lineTo(...mix(I0, I1, g0)); ctx.closePath(); }
+      else { ctx.beginPath(); ctx.arc(CX, CY, rout, a0, a1); ctx.arc(CX, CY, rin, a1, a0, true); ctx.closePath(); }
+      const gg = ctx.createRadialGradient(CX, CY, rin, CX, CY, rout); gg.addColorStop(0, rotating ? '#5a6274' : '#454b58'); gg.addColorStop(1, rotating ? '#3c4250' : '#2b303a'); ctx.fillStyle = gg; ctx.fill();
+      ctx.lineWidth = rotating ? 5 : 3; ctx.strokeStyle = rotating ? (rot.linked ? '#ff9f1c' : '#ffe66d') : 'rgba(0,0,0,.5)'; ctx.stroke();
+      const am = (a0 + a1) / 2, rm = (rin + rout) / 2 * (HEX ? C30 : 1); drawGem(ring.seq[k], CX + Math.cos(am) * rm, CY + Math.sin(am) * rm, Math.min(RW * (HEX ? .37 : .42), 52), am + Math.PI / 2); }
+    // anneau aligné sur les anneaux intérieurs : liseré doré
+    { const same = RINGS.every((_, j) => j > i || ((offs[j] - offs[i]) % NS + NS) % NS === 0) && !rotating; if (same && i > 0) { ctx.save(); ctx.lineWidth = 6; ctx.strokeStyle = '#ffe66d'; ctx.shadowColor = '#ffe66d'; ctx.shadowBlur = 14; ctx.lineJoin = 'round'; shapePath(rout + 3, o * Math.PI / 3); ctx.stroke(); ctx.restore(); } }
+  });
+  // liens : pastille sur l'anneau moteur, flèche vers l'anneau entraîné (clignote quand il entraîne)
+  LINKS.forEach(([a, b], n) => { const ang = LINK_ANG[n % LINK_ANG.length]; const ra = ringMid(a), rb = ringMid(b); const dir = rb > ra ? 1 : -1;
+    const fl = ROTS.find(r => r.ring === b && r.linked && r.from === a && t >= r.t && t < r.t + .3); const k = fl ? 1 + Math.sin(tw(t, fl.t, fl.t + .3) * Math.PI) * .35 : 1;
+    ctx.save(); ctx.translate(CX, CY); ctx.rotate(ang); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    const tip = rb + dir * 6, hw = 26 * k, hl = 34;
+    const path = () => { ctx.beginPath(); ctx.moveTo(ra, 0); ctx.lineTo(tip - dir * hl, 0); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(tip, 0); ctx.lineTo(tip - dir * hl, -hw); ctx.lineTo(tip - dir * hl, hw); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.arc(ra, 0, 17 * k, 0, 7); ctx.fill(); ctx.stroke(); };
+    ctx.strokeStyle = STROKE; ctx.fillStyle = STROKE; ctx.lineWidth = 26 * k; path();
+    ctx.strokeStyle = fl ? '#fff3a0' : '#ff9f1c'; ctx.fillStyle = fl ? '#fff3a0' : '#ff9f1c'; ctx.lineWidth = 12 * k; if (fl) { ctx.shadowColor = '#ffe66d'; ctx.shadowBlur = 24; } path();
+    ctx.restore(); });
+  // rayons alignés : trait lumineux
+  const rmax = (R0 + RINGS.length * RW - 8) * (HEX ? C30 : 1), rhub = (R0 - 14) * (HEX ? C30 : 1); const nAl = al.filter(Boolean).length;
+  al.forEach((ok, k) => { if (!ok) return; const a = k * 2 * Math.PI / NS - Math.PI / 2 + offs[0] * 2 * Math.PI / NS; ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 6; ctx.shadowColor = '#fff'; ctx.shadowBlur = 16; ctx.setLineDash([10, 8]);
+    ctx.beginPath(); ctx.moveTo(CX + Math.cos(a) * (rhub + 16), CY + Math.sin(a) * (rhub + 16)); ctx.lineTo(CX + Math.cos(a) * rmax, CY + Math.sin(a) * rmax); ctx.stroke(); ctx.restore(); });
+  // centre : volant, tourne à l'ouverture
+  const spin = OPEN_AT !== null ? easeInOut(tw(t, OPEN_AT - .05, OPEN_AT + .3)) * Math.PI : 0;
+  ctx.save(); ctx.translate(CX, CY); ctx.rotate(spin); ctx.beginPath(); ctx.arc(0, 0, rhub, 0, 7); const gc = ctx.createRadialGradient(-30, -30, 10, 0, 0, R0); gc.addColorStop(0, '#d9dee8'); gc.addColorStop(1, '#6b7280'); ctx.fillStyle = gc; ctx.fill(); ctx.lineWidth = 8; ctx.strokeStyle = '#22252c'; ctx.stroke();
+  ctx.lineWidth = 20; ctx.lineCap = 'round'; ctx.strokeStyle = '#2b303a'; ctx.beginPath(); for (let k = 0; k < 3; k++) { const a = k * Math.PI / 3; ctx.moveTo(Math.cos(a) * (rhub - 16), Math.sin(a) * (rhub - 16)); ctx.lineTo(-Math.cos(a) * (rhub - 16), -Math.sin(a) * (rhub - 16)); } ctx.stroke();
+  ctx.beginPath(); ctx.arc(0, 0, 32, 0, 7); ctx.fillStyle = nAl === NS ? '#2ecc71' : (ALARM_AT !== null && t >= ALARM_AT ? '#e74c3c' : '#9aa1ad'); ctx.fill(); ctx.restore();
+  if (openU > 0) { ctx.globalAlpha = openU * .5; ctx.fillStyle = '#000'; shapePath(R); ctx.fill(); }
+  ctx.restore();
+}
+function drawInside(t, u) { // intérieur du coffre (derrière la porte)
+  const R = RDOOR; ctx.save(); shapePath(R - 10); ctx.clip();
+  ctx.fillStyle = '#120f0c'; ctx.fillRect(0, 0, W, H); const g = ctx.createRadialGradient(CX, CY + 80, 20, CX, CY, R); g.addColorStop(0, 'rgba(255,220,120,.55)'); g.addColorStop(1, 'rgba(255,220,120,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  for (let s = 0; s < 3; s++) { const y = CY - 160 + s * 170; ctx.fillStyle = '#3a2a1a'; ctx.fillRect(CX - 300, y + 60, 600, 18);
+    for (let i = 0; i < 4; i++) { const x = CX - 240 + i * 130 + (s % 2) * 40; ctx.save(); ctx.translate(x, y + 40); ctx.fillStyle = '#f5c542'; ctx.beginPath(); ctx.moveTo(-50, 20); ctx.lineTo(50, 20); ctx.lineTo(38, -20); ctx.lineTo(-38, -20); ctx.closePath(); ctx.fill(); ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fillRect(-30, -14, 40, 8); ctx.lineWidth = 3; ctx.strokeStyle = '#a5700f'; ctx.stroke(); ctx.restore(); } }
+  ctx.lineWidth = 16; ctx.lineJoin = 'round'; ctx.strokeStyle = '#22252c'; shapePath(R - 10); ctx.stroke();
+  ctx.restore();
+  for (let i = 0; i < 8; i++) { const uu = tw(t, OPEN_AT + .3 + i * .04, OPEN_AT + .8 + i * .04); if (uu <= 0 || uu >= 1) continue; const a = i / 8 * Math.PI * 2; const d = 120 + easeOut(uu) * 260; ctx.save(); ctx.globalAlpha = 1 - uu; ctx.translate(CX + Math.cos(a) * d, CY + Math.sin(a) * d); ctx.rotate(uu * 3); ctx.fillStyle = '#fff'; ctx.beginPath(); for (let k = 0; k < 8; k++) { const r = k % 2 ? 10 : 30; ctx.lineTo(Math.cos(k * Math.PI / 4) * r, Math.sin(k * Math.PI / 4) * r); } ctx.fill(); ctx.restore(); }
+}
+function drawCoin(x, y, r) { ctx.save(); ctx.translate(x, y); const g = ctx.createRadialGradient(-r * .3, -r * .3, r * .2, 0, 0, r); g.addColorStop(0, '#fff3a0'); g.addColorStop(.6, '#f5c542'); g.addColorStop(1, '#c98a12');
+  ctx.beginPath(); ctx.arc(0, 0, r, 0, 7); ctx.fillStyle = g; ctx.fill(); ctx.lineWidth = r * .12; ctx.strokeStyle = '#8a5a00'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, r * .62, 0, 7); ctx.stroke(); ctx.restore(); }
+function drawCounter(value, bump = 0, cy = 330) { ctx.save(); ctx.translate(W - 60, cy); ctx.scale(1 + bump, 1 + bump);
+  ctx.beginPath(); rr(-330, -52, 330, 104, 52); ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.fill();
+  drawCoin(-270, 0, 40); ctx.font = `bold 64px ${FONT}`; ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff'; ctx.fillText(String(value), -40, 4); ctx.restore(); }
+function drawRipple(x, y, u) {
+  if (u <= 0 || u >= 1) return;
+  ctx.save(); ctx.globalAlpha = (1 - u) * .8; ctx.lineWidth = 10; ctx.strokeStyle = '#fff';
+  ctx.beginPath(); ctx.arc(x, y, 25 + u * 110, 0, 7); ctx.stroke(); ctx.restore();
+}
+function drawBanner(text, u, y = 230, size = 96) {
+  if (u <= 0) return; const s = .6 + .4 * back(clamp(u, 0, 1)); const lines = text.split('\n'); if (lines.length > 1) size = 80;
+  ctx.save(); ctx.translate(W / 2, y + (lines.length - 1) * 30); ctx.scale(s, s);
+  ctx.font = `bold ${size}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  lines.forEach((ln, i) => { const yy = (i - (lines.length - 1) / 2) * size * 1.15;
+    ctx.save(); ctx.lineJoin = 'round'; ctx.lineWidth = 22; ctx.strokeStyle = STROKE; ctx.strokeText(ln, 0, yy);
+    ctx.shadowColor = 'rgba(0,0,0,.4)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 6; ctx.fillStyle = '#fff'; ctx.fillText(ln, 0, yy); ctx.restore(); });
+  ctx.restore();
+}
+
+// ---------- suivi (branché sur le pixel à l'intégration) ----------
+const sent = {};
+function track(name, data) { if (sent[name]) return; sent[name] = 1; try { if (window.onDemoEvent) window.onDemoEvent(name, data || {}); } catch (e) {} }
+
+// ---------- état ----------
+let levelIdx = 0, tPlay = 0, playRipples = [], won = null, lost = null, coins = 0, shown = 0, bumpAt = -9, gain = 0;
+let lastTap = 0, tapped = false, ended = false, moves = 0, offs = [], fails = 0, wasted = 0, moveAt = -9, frozen = false;
+function startLevel(i) { levelIdx = i; const L = LEVELS[i];
+  RINGS = L.offs.map(o => ({ seq: BASE, off: o })); ROTS = []; R0 = L.r0; RW = (RDOOR - RIM - R0) / RINGS.length; LINKS = L.links; MOVES0 = L.moves; HEX = !!L.hex;
+  offs = L.offs.slice(); moves = 0; won = null; lost = null; OPEN_AT = null; ALARM_AT = null; lastTap = tPlay; gain = 0; }
+const movesLeft = () => MOVES0 - moves;
+const playing = () => !ended && won === null && lost === null;
+function ringAt(x, y) { let d = Math.hypot(x - CX, y - CY);
+  if (HEX) { const s60 = Math.PI / 3; const rel = Math.atan2(y - CY, x - CX) + Math.PI / 2; const phi = (((rel + s60 / 2) % s60) + s60) % s60 - s60 / 2; d = d * Math.cos(phi) / C30; } if (d < R0 - 24 || d > RDOOR + 10) return -1;
+  return clamp(Math.floor((d - R0) / RW), 0, RINGS.length - 1); }
+const tapPoint = i => { const r = ringMid(i) * (HEX ? C30 : 1); return [Math.round(CX + Math.cos(TAP_ANG) * r), Math.round(CY + Math.sin(TAP_ANG) * r)]; };
+function bestRing() { const L = LEVELS[levelIdx]; const d0 = distOf(L, offs); let best = -1;
+  for (let i = 0; i < RINGS.length; i++) if (distOf(L, stepState(offs, moveVec(L, i))) < d0) best = i; return best; }
+function worstRing() { const L = LEVELS[levelIdx]; const d0 = distOf(L, offs); let best = -1, bd = -1;
+  for (let i = 0; i < RINGS.length; i++) { const d = distOf(L, stepState(offs, moveVec(L, i))); if (d >= d0 && d > bd) { bd = d; best = i; } } return best; }
+function onTap(x, y) {
+  if (!playing()) return;
+  playRipples.push([x, y, tPlay]); lastTap = tPlay;
+  if (!tapped) { tapped = true; track('DemoStart'); }
+  const i = ringAt(x, y); if (i < 0) return;
+  const L = LEVELS[levelIdx]; const d0 = distOf(L, offs);
+  ROTS.push({ t: tPlay, ring: i, d: 1 }); for (const [a, b] of LINKS) if (a === i) ROTS.push({ t: tPlay, ring: b, d: 1, linked: true, from: a });
+  offs = stepState(offs, moveVec(L, i)); moves++; moveAt = tPlay;
+  if (distOf(L, offs) >= d0) wasted++;
+  if (aligned(offs)) { won = tPlay + ROT_DUR; OPEN_AT = won; gain = 100 + 20 * movesLeft(); coins += gain; track('DemoLevel' + (levelIdx + 1), { moves, wasted }); }
+  else if (movesLeft() <= 0) { lost = tPlay + ROT_DUR; ALARM_AT = lost; fails++; track('DemoFail' + (levelIdx + 1)); }
+}
+function pill(x, y, w, h, text, col = '#fff', size = 52) { ctx.save(); rr(x, y, w, h, h / 2); ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.fill();
+  ctx.font = `bold ${size}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = col; ctx.fillText(text, x + w / 2, y + h / 2 + 3); ctx.restore(); }
+function render() {
+  const t = tPlay; ctx.clearRect(0, 0, W, H); drawVaultBg();
+  const openU = won !== null ? easeInOut(tw(t, won + .12, won + .5)) : 0;
+  if (openU > 0) drawInside(t, openU);
+  drawDoor(t, openU);
+  // titre + HUD
+  ctx.save(); ctx.font = `900 84px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round'; ctx.lineWidth = 18; ctx.strokeStyle = STROKE;
+  ctx.strokeText('Crack le Coffre', W / 2, 110); ctx.fillStyle = '#ffd166'; ctx.fillText('Crack le Coffre', W / 2, 110); ctx.restore();
+  pill(60, 218, 330, 104, `Niveau ${levelIdx + 1}/3`);
+  if (won === null || t < won) { const ml = Math.max(0, movesLeft()); const b = t - moveAt; const k = b >= 0 && b < .2 ? 1 + Math.sin(b / .2 * Math.PI) * .12 : 1;
+    ctx.save(); ctx.translate(W / 2, 418); ctx.scale(k, k); pill(-190, -52, 380, 104, 'Coups : ' + ml, ml <= 2 ? '#ff6b6b' : '#fff', 58); ctx.restore(); }
+  const target = won !== null && t < won + .7 ? coins - gain : coins;
+  if (shown > target) shown = target;
+  if (shown < target) { if (shown === coins - gain) bumpAt = t; shown = Math.min(target, shown + 12); }
+  const bb = t - bumpAt; drawCounter(shown, bb >= 0 && bb < .3 ? Math.sin(bb / .3 * Math.PI) * .18 : 0, 270);
+  // pièces qui volent vers le compteur
+  if (won !== null) { const u = tw(t, won + .3, won + .75);
+    if (u > 0 && u < 1) { for (let i = 0; i < 6; i++) { const uu = clamp(u * 1.3 - i * .06, 0, 1); const e = easeIn(uu); drawCoin(CX + (W - 330 - CX) * e + (i - 2.5) * 26, CY + (270 - CY) * e - Math.sin(uu * Math.PI) * 200, 24); }
+      ctx.save(); ctx.globalAlpha = 1 - u; ctx.font = `bold 72px ${FONT}`; ctx.textAlign = 'center'; ctx.lineJoin = 'round'; ctx.lineWidth = 12; ctx.strokeStyle = '#2b2b2b'; ctx.strokeText('+' + gain, CX, CY - 60 - u * 80); ctx.fillStyle = '#ffe66d'; ctx.fillText('+' + gain, CX, CY - 60 - u * 80); ctx.restore(); } }
+  playRipples = playRipples.filter(k => t - k[2] < .45); playRipples.forEach(([x, y, t0]) => drawRipple(x, y, tw(t, t0, t0 + .45)));
+  // aide : anneau pulsant sur le prochain anneau à tourner (au début, puis après 5 s sans action)
+  if (playing() && (!tapped || t - lastTap > 5)) { const i = bestRing();
+    if (i >= 0) { const [hx, hy] = tapPoint(i); const u = (t * 1.2) % 1; ctx.save(); ctx.globalAlpha = 1 - u; ctx.lineWidth = 12; ctx.strokeStyle = '#fff'; ctx.beginPath(); ctx.arc(hx, hy, 34 + u * 60, 0, 7); ctx.stroke();
+      ctx.globalAlpha = 1; ctx.lineWidth = 8; ctx.strokeStyle = '#ffd166'; ctx.beginPath(); ctx.arc(hx, hy, 36, 0, 7); ctx.stroke(); ctx.restore(); } }
+  // texte bas
+  const line = !tapped ? 'Touche un anneau pour le tourner' : ['Aligne les couleurs pour ouvrir', 'Choisis bien quels anneaux tourner', 'Coffre hexagonal : réfléchis d’abord !'][levelIdx];
+  ctx.save(); ctx.font = `bold 46px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#dfe4ee'; ctx.fillText(line, W / 2, 1765);
+  ctx.font = `36px ${FONT}`; ctx.fillStyle = '#8f97a8'; ctx.fillText('Tourne. Aligne. Ouvre.', W / 2, 1835); ctx.restore();
+  if (lost !== null) { const a = tw(t, lost, lost + .3) * .45; const g = ctx.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .75); g.addColorStop(0, 'rgba(230,57,70,0)'); g.addColorStop(1, `rgba(230,57,70,${a})`); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    drawBanner('Raté ! Réessaie', tw(t, lost + .05, lost + .3), CY); if (t - lost > 1.2) startLevel(levelIdx); return; }
+  // fin de niveau
+  if (won !== null) { drawBanner(levelIdx === 2 ? 'Démo terminée !' : 'Niveau terminé !', tw(t, won + .1, won + .35), 418);
+    if (t - won > 1.25 && !ended) { if (levelIdx < 2) startLevel(levelIdx + 1); else endDemo(); } }
+}
+function endDemo() { ended = true; shown = coins; track('DemoDone', { coins, wasted, fails });
+  document.getElementById('endtxt').textContent = `Tu as gagné ${coins} pièces et ouvert les 3 coffres de la démo. Le jeu complet arrive bientôt sur Android, avec des centaines de coffres à ouvrir et un musée du butin à remplir.`;
+  document.getElementById('end').style.display = 'flex'; }
+document.getElementById('again').onclick = () => { document.getElementById('end').style.display = 'none'; ended = false; coins = 0; shown = 0; startLevel(0); document.getElementById('cta').style.display = ''; document.getElementById('form').style.display = 'none'; };
+document.getElementById('cta').onclick = () => { track('DemoWant'); document.getElementById('cta').style.display = 'none'; document.getElementById('form').style.display = 'block'; };
+document.getElementById('f').onsubmit = e => { e.preventDefault(); if (window.onDemoEmail) window.onDemoEmail(e.target); else { document.getElementById('form').style.display = 'none'; document.getElementById('ok').style.display = 'block'; } };
+
+startLevel(0); let last = performance.now();
+function loop(now) { if (!frozen) tPlay += Math.min(.05, (now - last) / 1000); last = now; render(); requestAnimationFrame(loop); }
+requestAnimationFrame(loop);
+cv.addEventListener('pointerdown', e => { e.preventDefault(); const r = cv.getBoundingClientRect(); onTap((e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height); });
+window.__demo = { onTap, simRandom, LEVELS,
+  get level() { return levelIdx; }, get ended() { return ended; }, get won() { return won; }, get lost() { return lost; }, get movesLeft() { return movesLeft(); },
+  get offsets() { return offs.slice(); }, get optimal() { return distOf(LEVELS[levelIdx], offs); },
+  optimalOf(i) { return distOf(LEVELS[i], LEVELS[i].offs); },
+  autoMove() { if (!playing()) return null; const i = bestRing(); return i < 0 ? null : tapPoint(i); },
+  badMove() { if (!playing()) return null; const i = worstRing(); return i < 0 ? null : tapPoint(i); },
+  set frozen(v) { frozen = !!v; }, adv(dt) { tPlay += dt; render(); } };
+</script>
+</body>
+</html>
