@@ -43,7 +43,7 @@ const easeOut = x => 1 - Math.pow(1 - x, 3);
 const easeIn = x => x * x * x;
 const easeInOut = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
-const REMOVE_DUR = 0.6;
+const REMOVE_DUR = 0.22;
 
 const COL = {
   red: '#e0563f', blue: '#3f7fe0', green: '#4caf50', yellow: '#f2c14e', purple: '#9b59b6',
@@ -66,10 +66,10 @@ function plankState(p, t) {
   if (p.swingAt !== null && t >= p.swingAt) {
     const d = t - p.swingAt; const sc = p.screws[p.swingPivot];
     px = p.x + sc.dx; py = p.y + sc.dy;
-    ang = p.swingAngle * (1 - Math.cos(d * 6) * Math.exp(-d * 2.5));
+    ang = p.swingAngle * (1 - Math.cos(d * 14) * Math.exp(-d * 6));
   }
   if (p.fallAt !== null && t >= p.fallAt) {
-    const d = t - p.fallAt; dy += 1800 * d * d; ang += p.fallSpin * d;
+    const d = t - p.fallAt; dy += 5200 * d * d; ang += p.fallSpin * d;
     if (p.y + dy > H + 400) gone = true;
   }
   return { dx, dy, ang, px, py, gone };
@@ -189,16 +189,18 @@ function level2() {
 }
 function level3() {
   return [
-    plank(180, 520, 720, 100, COL.red, 5, [[60, 50], [660, 50]]),
-    plank(220, 600, 100, 800, COL.blue, 4, [[50, 60], [50, 740]]),
-    plank(760, 600, 100, 800, COL.green, 4, [[50, 60], [50, 740]]),
-    plank(180, 800, 720, 100, COL.yellow, 3, [[135, 50], [585, 50]]),
-    plank(490, 450, 100, 1100, COL.purple, 2, [[50, 80], [50, 1020]]),
-    plank(180, 1050, 720, 100, COL.orange, 1, [[135, 50], [585, 50]]),
-    plank(180, 1300, 720, 100, COL.teal, 0, [[30, 50], [360, 50]]),
-    plank(330, 680, 420, 90, COL.pink, 6, [[45, 45], [375, 45]]),
-    plank(640, 900, 90, 500, COL.brown, 7, [[45, 60], [45, 440]]),
-    plank(250, 1480, 580, 90, COL.grey, 2, [[60, 45], [520, 45]]),
+    plank(380, 430, 320, 90, COL.pink, 12, [[45, 45], [275, 45]]),
+    plank(490, 400, 100, 1180, COL.purple, 11, [[50, 114], [50, 1056]]),
+    plank(180, 560, 720, 100, COL.red, 10, [[60, 50], [316, 50]]),
+    plank(200, 520, 100, 820, COL.blue, 9, [[50, 134], [50, 660]]),
+    plank(780, 520, 100, 820, COL.green, 9, [[50, 134], [50, 660]]),
+    plank(180, 820, 720, 100, COL.yellow, 8, [[114, 50], [606, 50]]),
+    plank(180, 1230, 720, 100, COL.orange, 7, [[114, 50], [606, 50]]),
+    plank(340, 700, 100, 860, COL.teal, 6, [[50, 214], [50, 536]]),
+    plank(640, 700, 100, 860, COL.brown, 6, [[50, 214], [50, 536]]),
+    plank(180, 1010, 720, 100, COL.grey, 5, [[254, 50], [466, 50]]),
+    plank(400, 1450, 280, 90, COL.red, 13, [[45, 45], [235, 45]]),
+    plank(180, 1420, 720, 100, COL.blue, 4, [[360, 50], [480, 50]]),
   ];
 }
 const LEVELS = [level1, level2, level3];
@@ -227,9 +229,12 @@ function onTap(x, y) {
   playRipples.push([x, y, tPlay]); lastTap = tPlay;
   if (!tapped) { tapped = true; track('DemoStart'); }
   const all = freeScrews().map(k => ({ ...k, d: Math.hypot(x - k.sx, y - k.sy) }));
-  let hit = all.filter(k => !k.cov && k.d < 85).sort((a, b) => a.d - b.d)[0];
+  // vis cachée entièrement sous une planche = intouchable ; sinon la plus proche du doigt l'emporte
+  const vis = k => !k.cov || !planks.some(q => q !== k.p && q.layer > k.p.layer && present(q) && k.sx - 20 >= q.x && k.sx + 20 <= q.x + q.w && k.sy - 20 >= q.y && k.sy + 20 <= q.y + q.h);
+  const near = all.filter(k => k.d < (k.cov ? 52 : 82) && vis(k)).sort((a, b) => a.d - b.d)[0];
+  let hit = near && !near.cov ? near : null;
   if (!hit) {
-    const bl = all.filter(k => k.cov && k.d < 55).sort((a, b) => a.d - b.d)[0];
+    const bl = near;
     if (bl) { bl.p.shakeAt.push(tPlay); playX.push([bl.sx, bl.sy, tPlay]); blockedCount++; lives--; lifeAt = tPlay; msg = ['Vis coincée sous une planche !', tPlay]; if (lives <= 0) { lost = tPlay; fails++; track('DemoFail' + (levelIdx + 1)); } }
     return;
   }
@@ -252,14 +257,14 @@ function render() {
   pill(60, 218, 330, 104, `Niveau ${levelIdx + 1}/3`);
   for (let i = 0; i < 3; i++) { const lostNow = i === lives && tPlay - lifeAt < .4; heart(470 + i * 72, 276, lostNow ? 2 + Math.sin((tPlay - lifeAt) / .4 * Math.PI) * .8 : 2, i < lives); }
   if (shown > coins) shown = coins;
-  if (shown < coins) shown = Math.min(coins, shown + 2);
+  if (shown < coins) shown = Math.min(coins, shown + 5);
   const b = tPlay - bumpAt; drawCounter(shown, b >= 0 && b < .3 ? Math.sin(b / .3 * Math.PI) * .18 : 0, 270);
   // +30
-  floats = floats.filter(f => tPlay - f[2] < .9);
-  for (const [x, y, t0] of floats) { const u = tw(tPlay, t0, t0 + .9); if (u <= 0) continue; if (u < .1) bumpAt = t0 + .5;
+  floats = floats.filter(f => tPlay - f[2] < .7);
+  for (const [x, y, t0] of floats) { const u = tw(tPlay, t0, t0 + .7); if (u <= 0) continue; if (u < .15) bumpAt = t0 + .2;
     ctx.save(); ctx.globalAlpha = 1 - u; ctx.font = `bold 64px ${FONT}`; ctx.textAlign = 'center'; ctx.lineJoin = 'round'; ctx.lineWidth = 10; ctx.strokeStyle = STROKE;
     ctx.strokeText('+' + GAIN, x, y - 40 - u * 110); ctx.fillStyle = '#ffe66d'; ctx.fillText('+' + GAIN, x, y - 40 - u * 110); drawCoin(x - 95, y - 62 - u * 110, 24); ctx.restore(); }
-  playX = playX.filter(k => tPlay - k[2] < .8); playX.forEach(([x, y, t0]) => drawX(x, y, tw(tPlay, t0, t0 + .8)));
+  playX = playX.filter(k => tPlay - k[2] < .55); playX.forEach(([x, y, t0]) => drawX(x, y, tw(tPlay, t0, t0 + .3)));
   playRipples = playRipples.filter(k => tPlay - k[2] < .45); playRipples.forEach(([x, y, t0]) => drawRipple(x, y, tw(tPlay, t0, t0 + .45)));
   // aide : anneau sur une vis libre (au début, puis après 5 s sans action)
   if (won === null && lost === null && (!tapped || tPlay - lastTap > 5)) {
@@ -273,11 +278,11 @@ function render() {
   if (msg && tPlay - msg[1] < 2.6) { line = msg[0]; col = '#c0392b'; }
   ctx.save(); ctx.font = `bold 46px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = col; ctx.fillText(line, W / 2, 1765); ctx.restore();
   if (lost !== null) { const a = tw(tPlay, lost, lost + .3) * .45; const g = ctx.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .75); g.addColorStop(0, 'rgba(230,57,70,0)'); g.addColorStop(1, `rgba(230,57,70,${a})`); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-    drawBanner('Raté ! Réessaie', tw(tPlay, lost + .2, lost + .6), 960); if (tPlay - lost > 1.7) { coins = coinsAtStart; startLevel(levelIdx); } return; }
+    drawBanner('Raté ! Réessaie', tw(tPlay, lost + .1, lost + .35), 960); if (tPlay - lost > 1.2) { coins = coinsAtStart; startLevel(levelIdx); } return; }
   // fin de niveau
-  if (won === null && planks.every(p => p.fallAt !== null && plankState(p, tPlay).gone)) { won = tPlay; track('DemoLevel' + (levelIdx + 1), { errors: blockedCount }); }
-  if (won !== null) { drawBanner(levelIdx === 2 ? 'Démo terminée !' : 'Niveau terminé !', tw(tPlay, won, won + .4), 960);
-    if (tPlay - won > 1.5 && !ended) { if (levelIdx < 2) startLevel(levelIdx + 1); else endDemo(); } }
+  if (won === null && planks.every(p => p.fallAt !== null && tPlay > p.fallAt + .3)) { won = tPlay; track('DemoLevel' + (levelIdx + 1), { errors: blockedCount }); }
+  if (won !== null) { drawBanner(levelIdx === 2 ? 'Démo terminée !' : 'Niveau terminé !', tw(tPlay, won, won + .25), 960);
+    if (tPlay - won > 1.0 && !ended) { if (levelIdx < 2) startLevel(levelIdx + 1); else endDemo(); } }
 }
 function endDemo() { ended = true; track('DemoDone', { coins, errors: blockedCount, fails });
   document.getElementById('endtxt').textContent = `Tu as gagné ${coins} pièces et terminé la démo. Le jeu complet arrive bientôt sur Android, avec des centaines de niveaux et des ateliers à rénover.`;
