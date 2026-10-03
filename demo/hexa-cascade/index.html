@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="robots" content="noindex">
+<title>Hexa Cascade — démo jouable</title>
+<style>
+  html,body{margin:0;height:100%;background:#2a221b;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+  #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  #c{display:block;width:min(100vw,calc(100dvh*9/16));height:auto;aspect-ratio:9/16;background:#d9cfc4;touch-action:none}
+  #end{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(30,22,15,.78);padding:20px;box-sizing:border-box}
+  #card{background:#fff8ee;border-radius:22px;padding:26px 22px;max-width:340px;width:100%;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+  #card h2{margin:0 0 6px;font-size:28px;color:#3a2a1c}
+  #card p{margin:8px 0 18px;font-size:16px;line-height:1.4;color:#5a4a3a}
+  .btn{display:block;width:100%;border:0;border-radius:16px;padding:16px;font-size:20px;font-weight:800;color:#fff;background:#14b8a6;box-shadow:0 6px 0 #0f766e;cursor:pointer}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #0f766e}
+  .lnk{margin-top:16px;background:none;border:0;color:#8a7a6a;font-size:15px;text-decoration:underline;cursor:pointer}
+  #form{display:none;margin-top:4px}
+  #form input[type=email]{width:100%;box-sizing:border-box;padding:14px;font-size:17px;border:2px solid #d8c9b6;border-radius:12px;margin-bottom:10px}
+  #ok{display:none;font-weight:700;color:#2e7d32;font-size:17px}
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="c" width="1080" height="1920"></canvas></div>
+<div id="end"><div id="card">
+  <h2>Bravo&nbsp;! 🎉</h2>
+  <p id="endtxt">Tu as terminé la démo. Le jeu complet arrive bientôt sur Android, avec des centaines de niveaux et une île à faire grandir.</p>
+  <button class="btn" id="cta">Je veux le jeu complet</button>
+  <div id="form"><p>Laisse ton e-mail pour être prévenu à la sortie.</p>
+    <form id="f"><input type="hidden" name="jeu" value="Hexa Cascade (démo)"><input type="email" name="email" placeholder="ton@email.com" required><button class="btn" type="submit">Prévenez-moi</button></form></div>
+  <div id="ok">C’est noté ! On te prévient dès la sortie.</div>
+  <button class="lnk" id="again">Rejouer la démo</button>
+</div></div>
+<script>
+// Hexa Cascade — démo jouable 3 niveaux (page de test du concept)
+const W = 1080, H = 1920;
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif'; const STROKE = '#1b2a33';
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const tw = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
+const easeOut = x => 1 - Math.pow(1 - x, 3);
+const easeIn = x => x * x * x;
+const easeInOut = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const COL = { red: '#e74c3c', blue: '#3b82f6', green: '#22c55e', yellow: '#f5c542', purple: '#a855f7', orange: '#f97316', teal: '#14b8a6' };
+function shade(hex, k) { const n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  const f = c => clamp(Math.round(k < 0 ? c * (1 + k) : c + (255 - c) * k), 0, 255); return `rgb(${f(r)},${f(g)},${f(b)})`; }
+
+//ENGINE-START  (logique pure, partagée avec sim.js — aucune dépendance au canvas)
+const POP_N = 7;
+const CELLS = []; for (let q = -2; q <= 2; q++) for (let r = -2; r <= 2; r++) if (Math.max(Math.abs(q), Math.abs(r), Math.abs(q + r)) <= 2) CELLS.push([q, r]);
+const key = (q, r) => q + ',' + r;
+const NB = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, -1], [-1, 1]];
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const rep = (c, n) => Array(n).fill(c);
+const LEVELS = [
+  { colors: ['red', 'blue'], target: 21, blocked: [], seed: 101, minN: 2, maxN: 4, mixP: 0,
+    pre: [[-1, 0, rep('red', 4)], [1, 0, rep('blue', 4)]],
+    first: [rep('red', 3), rep('blue', 3), rep('red', 3)] },
+  { colors: ['red', 'blue', 'yellow'], target: 49, blocked: ['0,-2', '0,2'], seed: 202, minN: 2, maxN: 4, mixP: .5,
+    pre: [[-1, -1, rep('yellow', 3)], [1, 0, rep('red', 3)], [-1, 1, rep('blue', 2)]] },
+  { colors: ['red', 'blue', 'yellow', 'green'], target: 63, blocked: ['0,0', '-2,2', '2,-2'], seed: 303, minN: 2, maxN: 4, mixP: .6,
+    pre: [[-1, 0, ['green', 'green', 'red', 'red']], [1, -1, ['blue', 'yellow', 'yellow']], [0, 1, ['red', 'blue', 'blue']], [1, 1, ['yellow', 'green', 'green']], [-1, -1, ['blue', 'blue', 'yellow']]] },
+];
+function topRun(st) { if (!st.length) return 0; const c = st[st.length - 1]; let n = 0; for (let i = st.length - 1; i >= 0 && st[i] === c; i--) n++; return n; }
+// règles de fusion reprises de la scène pub : la pile qui a le plus de tuiles de la couleur attire l'autre ; POP_N ou plus = explosion
+function resolveLogic(board, queue, ev) {
+  let popped = 0, guard = 0;
+  while (queue.length && guard++ < 400) {
+    const k = queue.shift(); const st = board[k]; if (!st || !st.length) continue;
+    const c = st[st.length - 1]; const [q, r] = k.split(',').map(Number);
+    for (const [dq, dr] of NB) {
+      const nk = key(q + dq, r + dr); const ns = board[nk];
+      if (!ns || !ns.length || ns[ns.length - 1] !== c) continue;
+      let sk = nk, dk = k; if (topRun(ns) > topRun(st)) { sk = k; dk = nk; }
+      const src = board[sk], dst = board[dk]; const n = topRun(src);
+      for (let i = 0; i < n; i++) dst.push(src.pop());
+      if (ev) ev.push({ m: 'move', from: sk, to: dk, n });
+      const n2 = topRun(dst);
+      if (n2 >= POP_N) { dst.length -= n2; popped += n2; if (ev) ev.push({ m: 'pop', k: dk, n: n2, color: c }); }
+      queue.push(dk); if (src.length) queue.push(sk);
+      break;
+    }
+  }
+  return popped;
+}
+function genStack(rng, L) {
+  const n = L.minN + Math.floor(rng() * (L.maxN - L.minN + 1));
+  const a = L.colors[Math.floor(rng() * L.colors.length)];
+  if (rng() < L.mixP && n >= 2) { let b = a; while (b === a) b = L.colors[Math.floor(rng() * L.colors.length)]; const cut = 1 + Math.floor(rng() * (n - 1)); return [...rep(b, cut), ...rep(a, n - cut)]; }
+  return rep(a, n);
+}
+function newGame(i) {
+  const L = LEVELS[i]; const board = {};
+  for (const [q, r] of CELLS) if (!L.blocked.includes(key(q, r))) board[key(q, r)] = [];
+  for (const [q, r, cs] of L.pre) board[key(q, r)] = cs.slice();
+  const G = { L, board, rng: mulberry32(L.seed), batch: 0, popped: 0, placed: 0, tray: [null, null, null] };
+  refill(G); return G;
+}
+function refill(G) { G.tray = (G.batch === 0 && G.L.first) ? G.L.first.map(s => s.slice()) : [0, 1, 2].map(() => genStack(G.rng, G.L)); G.batch++; }
+function emptyKeys(G) { return Object.keys(G.board).filter(k => !G.board[k].length); }
+function doPlace(G, slot, k, ev) {
+  const cs = G.tray[slot]; G.tray[slot] = null; G.board[k].push(...cs); G.placed++;
+  const p = resolveLogic(G.board, [k], ev); G.popped += p;
+  if (G.tray.every(s => !s)) { refill(G); if (ev) ev.push({ m: 'refill' }); }
+  return p;
+}
+function status(G) { return G.popped >= G.L.target ? 'won' : (emptyKeys(G).length === 0 ? 'lost' : 'play'); }
+function evalMove(G, slot, k) {
+  const b = {}; for (const kk in G.board) b[kk] = G.board[kk].slice();
+  b[k].push(...G.tray[slot]); const p = resolveLogic(b, [k], null);
+  let s = p * 20;
+  for (const kk in b) { const st = b[kk]; if (!st.length) { s += 8; continue; } let sg = 0; for (let i = 1; i < st.length; i++) if (st[i] !== st[i - 1]) sg++; const tr = topRun(st); s += tr * tr * .3 - sg * 5 - st.length * .5; }
+  return s;
+}
+// stratégie gloutonne (1 coup d'avance) : sign=1 meilleur coup, sign=-1 pire coup ; only = pile imposée
+function greedyMove(G, sign, only) {
+  let best = null, bs = -Infinity; const em = emptyKeys(G);
+  for (let s = 0; s < 3; s++) { if (!G.tray[s] || (only !== undefined && only !== s)) continue;
+    for (const k of em) { const v = evalMove(G, s, k) * (sign || 1); if (v > bs) { bs = v; best = { slot: s, k }; } } }
+  return best;
+}
+//ENGINE-END
+
+// ---------- géométrie hex (pointe en haut) ----------
+const R = 104, TH = 16, CX = 540, CY = 965;
+const cellXY = k => { const [q, r] = k.split(',').map(Number); return [CX + R * Math.sqrt(3) * (q + r / 2), CY + R * 1.5 * r]; };
+function hexPath(x, y, rad) { ctx.beginPath(); for (let i = 0; i < 6; i++) { const a = Math.PI / 6 + i * Math.PI / 3; const px = x + rad * Math.cos(a), py = y + rad * Math.sin(a); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); } ctx.closePath(); }
+function rr(x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+const TX = [220, 540, 860], TY = 1585, HELD_DY = 150;
+const MOVE = .16, STEP = .022, DROP = .12, POP_PAUSE = .26, POP_DUR = .3;
+
+// ---------- dessin ----------
+function drawTile(color, x, y, alpha, scale) {
+  ctx.save(); ctx.globalAlpha = alpha; ctx.translate(x, y); ctx.scale(scale, scale);
+  hexPath(0, TH, R - 12); ctx.fillStyle = shade(COL[color], -.45); ctx.fill();
+  hexPath(0, 0, R - 12); const g = ctx.createLinearGradient(-R, -R, R, R); g.addColorStop(0, shade(COL[color], .3)); g.addColorStop(1, shade(COL[color], -.15)); ctx.fillStyle = g; ctx.fill();
+  ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.stroke();
+  hexPath(0, 0, R - 30); ctx.strokeStyle = 'rgba(255,255,255,.25)'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.restore();
+}
+function drawCoin(x, y, r) { ctx.save(); ctx.translate(x, y); const g = ctx.createRadialGradient(-r * .3, -r * .3, r * .2, 0, 0, r); g.addColorStop(0, '#fff3a0'); g.addColorStop(.6, '#f5c542'); g.addColorStop(1, '#c98a12');
+  ctx.beginPath(); ctx.arc(0, 0, r, 0, 7); ctx.fillStyle = g; ctx.fill(); ctx.lineWidth = r * .12; ctx.strokeStyle = '#8a5a00'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, r * .62, 0, 7); ctx.stroke(); ctx.restore(); }
+function drawCounter(value, bump = 0, cy = 330) { ctx.save(); ctx.translate(W - 60, cy); ctx.scale(1 + bump, 1 + bump);
+  ctx.beginPath(); rr(-330, -52, 330, 104, 52); ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.fill();
+  drawCoin(-270, 0, 40); ctx.font = `bold 64px ${FONT}`; ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff'; ctx.fillText(String(value), -40, 4); ctx.restore(); }
+function drawRipple(x, y, u) {
+  if (u <= 0 || u >= 1) return;
+  ctx.save(); ctx.globalAlpha = (1 - u) * .8; ctx.lineWidth = 10; ctx.strokeStyle = '#fff';
+  ctx.beginPath(); ctx.arc(x, y, 25 + u * 110, 0, 7); ctx.stroke(); ctx.restore();
+}
+function drawX(x, y, u) {
+  if (u <= 0) return; const s = back(clamp(u * 3, 0, 1));
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.lineWidth = 18; ctx.lineCap = 'round'; ctx.strokeStyle = '#ff3b3b';
+  ctx.shadowColor = 'rgba(0,0,0,.3)'; ctx.shadowBlur = 10;
+  ctx.beginPath(); ctx.moveTo(-40, -40); ctx.lineTo(40, 40); ctx.moveTo(40, -40); ctx.lineTo(-40, 40); ctx.stroke(); ctx.restore();
+}
+function drawBanner(text, u, y = 230, size = 96) {
+  if (u <= 0) return; const s = .6 + .4 * back(clamp(u, 0, 1)); const lines = text.split('\n'); if (lines.length > 1) size = 80;
+  ctx.save(); ctx.translate(W / 2, y + (lines.length - 1) * 30); ctx.scale(s, s);
+  ctx.font = `bold ${size}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  lines.forEach((ln, i) => { const yy = (i - (lines.length - 1) / 2) * size * 1.15;
+    ctx.save(); ctx.lineJoin = 'round'; ctx.lineWidth = 22; ctx.strokeStyle = STROKE; ctx.strokeText(ln, 0, yy);
+    ctx.shadowColor = 'rgba(0,0,0,.4)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 6; ctx.fillStyle = '#fff'; ctx.fillText(ln, 0, yy); ctx.restore(); });
+  ctx.restore();
+}
+function pill(x, y, w, h, text) { ctx.save(); rr(x, y, w, h, h / 2); ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.fill();
+  ctx.font = `bold 52px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff'; ctx.fillText(text, x + w / 2, y + h / 2 + 3); ctx.restore(); }
+function ring(x, y, r0) { const u = (tReal * 1.2) % 1; ctx.save(); ctx.globalAlpha = 1 - u; ctx.lineWidth = 12; ctx.strokeStyle = '#fff'; ctx.beginPath(); ctx.arc(x, y, r0 + u * 60, 0, 7); ctx.stroke();
+  ctx.globalAlpha = 1; ctx.lineWidth = 8; ctx.strokeStyle = '#ffd166'; ctx.beginPath(); ctx.arc(x, y, r0 + 2, 0, 7); ctx.stroke(); ctx.restore(); }
+
+// ---------- suivi (branché sur le pixel à l'intégration) ----------
+const sent = {};
+function track(name, data) { if (sent[name]) return; sent[name] = 1; try { if (window.onDemoEvent) window.onDemoEvent(name, data || {}); } catch (e) {} }
+
+// ---------- état ----------
+let G, levelIdx = 0, tReal = 0, ta = 0, tiles = [], vis = {}, pops = [], animEnd = 0, selected = -1, drag = null, trayAt = 0;
+let wonAt = null, lostAt = null, wonSent = false, coins = 0, coinsAtStart = 0, fails = 0, ended = false, tapped = false, lastTap = 0, msg = null;
+let playX = [], playRipples = [], hintCache = null, lastPopped = 0, popCount = 0;
+function startLevel(i) {
+  levelIdx = i; G = newGame(i); tiles = []; vis = {}; pops = []; animEnd = ta; selected = -1; drag = null; trayAt = ta;
+  wonAt = null; lostAt = null; wonSent = false; coinsAtStart = coins; lastTap = tReal; msg = null; playX = []; hintCache = null; lastPopped = 0;
+  for (const k in G.board) { vis[k] = []; G.board[k].forEach((c, idx) => { const tile = { color: c, kf: [{ t: -1, k, idx, dur: 0 }] }; vis[k].push(tile); tiles.push(tile); }); }
+}
+function hint() { // meilleur coup glouton, en respectant la pile déjà sélectionnée
+  const id = G.placed + ':' + selected; if (hintCache && hintCache.id === id && hintCache.G === G) return hintCache.m;
+  const m = greedyMove(G, 1, selected >= 0 && G.tray[selected] ? selected : undefined); hintCache = { id, G, m }; return m;
+}
+function place(slot, k, fx, fy) {
+  if (animEnd > ta) ta = animEnd; // le joueur enchaîne : on termine d'un coup l'animation en cours
+  const colors = G.tray[slot]; const ev = [];
+  colors.forEach((c, i) => { const tile = { color: c, kf: [{ t: ta - 1, abs: true, x: fx, y: fy - i * TH, dur: 0 }, { t: ta, k, idx: vis[k].length, dur: DROP, drop: true }] }; vis[k].push(tile); tiles.push(tile); });
+  const p = doPlace(G, slot, k, ev); lastPopped = p; coins += p * 10;
+  let t = ta + DROP;
+  for (const e of ev) {
+    if (e.m === 'move') { const src = vis[e.from], dst = vis[e.to]; for (let i = 0; i < e.n; i++) { const tile = src.pop(); tile.kf.push({ t, k: e.to, idx: dst.length, dur: MOVE }); dst.push(tile); t += STEP; } t += MOVE; }
+    else if (e.m === 'pop') { const st = vis[e.k]; for (let i = 0; i < e.n; i++) { const tile = st.pop(); tile.popAt = t + i * .02; } const [px, py] = cellXY(e.k); pops.push({ t, x: px, y: py - st.length * TH, n: e.n, color: e.color }); popCount++; t += POP_PAUSE; }
+    else if (e.m === 'refill') trayAt = ta;
+  }
+  animEnd = t; selected = -1; hintCache = null;
+  const s = status(G);
+  if (s === 'won') wonAt = animEnd + .1;
+  else if (s === 'lost') { lostAt = animEnd + .1; fails++; }
+}
+function cellAt(x, y) { let best = null, bd = R * .98; for (const [q, r] of CELLS) { const k = key(q, r); const [cx, cy] = cellXY(k); const d = Math.hypot(x - cx, y - cy); if (d < bd) { bd = d; best = k; } } return best; }
+function slotAt(x, y) { if (y < TY - 190 || y > TY + 150) return -1; for (let i = 0; i < 3; i++) if (Math.abs(x - TX[i]) < 150) return i; return -1; }
+function tapCell(k) {
+  const [cx, cy] = cellXY(k);
+  if (!(k in G.board)) { msg = ['Case bloquée !', tReal]; playX.push([cx, cy, tReal]); return; }
+  if (selected < 0 || !G.tray[selected]) { msg = ['Choisis d’abord une pile en bas', tReal]; return; }
+  if (G.board[k].length) { msg = ['Case occupée : vise une case vide', tReal]; playX.push([cx, cy - G.board[k].length * TH, tReal]); return; }
+  place(selected, k, TX[selected], TY - 34);
+}
+function onDown(x, y) {
+  if (ended || wonAt !== null || lostAt !== null) return;
+  playRipples.push([x, y, tReal]); lastTap = tReal;
+  if (!tapped) { tapped = true; track('DemoStart'); }
+  const s = slotAt(x, y);
+  if (s >= 0) { if (G.tray[s]) { selected = s; drag = { x0: x, y0: y, x, y, moved: false }; msg = null; } return; }
+  const k = cellAt(x, y); if (k) tapCell(k);
+}
+function onMove(x, y) { if (!drag) return; drag.x = x; drag.y = y; if (Math.hypot(x - drag.x0, y - drag.y0) > 45) drag.moved = true; }
+function dragCell() { if (!drag || !drag.moved) return null; const k = cellAt(drag.x, drag.y - HELD_DY); return k && (k in G.board) && !G.board[k].length ? k : null; }
+function onUp() {
+  if (!drag) return; const k = dragCell(); const d = drag; drag = null; lastTap = tReal;
+  if (k && selected >= 0 && wonAt === null && lostAt === null) place(selected, k, d.x, d.y - HELD_DY);
+}
+
+function tilePos(tile) {
+  const kf = tile.kf; let i = kf.length - 1; while (i > 0 && kf[i].t > ta) i--;
+  const k = kf[i]; const pos = f => { if (f.abs) return [f.x, f.y]; const [cx, cy] = cellXY(f.k); return [cx, cy - f.idx * TH]; };
+  let [x, y] = pos(k), moving = false;
+  if (i > 0 && ta < k.t + k.dur) { const [px, py] = pos(kf[i - 1]); const u = easeInOut(tw(ta, k.t, k.t + k.dur)); x = px + (x - px) * u; y = py + (y - py) * u - Math.sin(u * Math.PI) * (k.drop ? 0 : 60); moving = true; }
+  let alpha = 1, scale = 1;
+  if (tile.popAt !== undefined && ta >= tile.popAt) { const u = tw(ta, tile.popAt, tile.popAt + POP_DUR); if (u >= 1) { tile.dead = true; return null; } y -= u * 170; alpha = 1 - u; scale = 1 + u * .4; moving = true; }
+  return { x, y, alpha, scale, moving, sy: k.abs ? 0 : cellXY(k.k)[1], idx: k.idx || 0 };
+}
+function drawBg() {
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#2f6f8f'); g.addColorStop(1, '#173a4f'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const hover = dragCell(); const sel = selected >= 0 && wonAt === null && lostAt === null; const pulse = .5 + .5 * Math.sin(tReal * 7);
+  for (const [q, r] of CELLS) { const k = key(q, r); const [x, y] = cellXY(k);
+    hexPath(x, y + 6, R - 4); ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fill(); hexPath(x, y, R - 4);
+    if (!(k in G.board)) { // case bloquée (rocher)
+      ctx.fillStyle = '#1d3340'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,.4)'; ctx.stroke();
+      hexPath(x, y - 10, R - 26); const gr = ctx.createLinearGradient(x - R, y - R, x + R, y + R); gr.addColorStop(0, '#8a98a3'); gr.addColorStop(1, '#4d5a64'); ctx.fillStyle = gr; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = '#2f3940'; ctx.stroke();
+      ctx.lineWidth = 12; ctx.lineCap = 'round'; ctx.strokeStyle = '#2f3940'; ctx.beginPath(); ctx.moveTo(x - 24, y - 34); ctx.lineTo(x + 24, y + 14); ctx.moveTo(x + 24, y - 34); ctx.lineTo(x - 24, y + 14); ctx.stroke();
+      continue; }
+    const empty = !G.board[k].length;
+    ctx.fillStyle = k === hover ? '#8fe3d0' : (sel && empty ? shade('#3c7d99', .12 + .2 * pulse) : '#3c7d99'); ctx.fill();
+    ctx.lineWidth = sel && empty ? 5 : 3; ctx.strokeStyle = sel && empty ? `rgba(255,255,255,${.45 + .4 * pulse})` : 'rgba(255,255,255,.18)'; ctx.stroke(); }
+}
+function drawTiles() {
+  const list = []; let anyDead = false;
+  for (const tile of tiles) { const p = tilePos(tile); if (p) list.push({ tile, p }); else anyDead = true; }
+  if (anyDead) tiles = tiles.filter(t => !t.dead);
+  list.sort((a, b) => (a.p.moving - b.p.moving) || (a.p.sy - b.p.sy) || (a.p.idx - b.p.idx));
+  for (const { tile, p } of list) drawTile(tile.color, p.x, p.y, p.alpha, p.scale);
+  // nombre de tuiles de la couleur du dessus (repère pour atteindre POP_N), une fois les animations finies
+  if (ta >= animEnd) for (const k in G.board) { const st = G.board[k]; if (!st.length) continue; const [x, y] = cellXY(k); const n = topRun(st);
+    ctx.save(); ctx.font = `bold 60px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round'; ctx.lineWidth = 9; ctx.strokeStyle = 'rgba(0,0,0,.5)'; ctx.strokeText(n, x, y - (st.length - 1) * TH + 3); ctx.fillStyle = '#fff'; ctx.fillText(n, x, y - (st.length - 1) * TH + 3); ctx.restore(); }
+}
+function drawPops() {
+  for (const pp of pops) { const u = tw(ta, pp.t, pp.t + .65); if (u <= 0 || u >= 1) continue;
+    for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2 + pp.n; const d = easeOut(u) * 190; ctx.save(); ctx.globalAlpha = 1 - u; ctx.translate(pp.x + Math.cos(a) * d, pp.y + Math.sin(a) * d * .7 - u * 80);
+      ctx.fillStyle = i % 2 ? '#fff' : COL[pp.color]; ctx.beginPath(); ctx.arc(0, 0, 12 * (1 - u) + 3, 0, 7); ctx.fill(); ctx.restore(); }
+    ctx.save(); ctx.globalAlpha = 1 - u * u; ctx.font = `bold 84px ${FONT}`; ctx.textAlign = 'center'; ctx.lineJoin = 'round'; ctx.lineWidth = 14; ctx.strokeStyle = '#2b2b2b';
+    ctx.strokeText('+' + pp.n * 10, pp.x, pp.y - 60 - u * 120); ctx.fillStyle = '#ffe66d'; ctx.fillText('+' + pp.n * 10, pp.x, pp.y - 60 - u * 120); ctx.restore();
+    const uc = tw(ta, pp.t + .05, pp.t + .4); if (uc > 0 && uc < 1) for (let i = 0; i < 5; i++) { const uu = clamp(uc * 1.3 - i * .06, 0, 1); const e = easeIn(uu); drawCoin(pp.x + (W - 330 - pp.x) * e + Math.sin(uu * Math.PI) * (i - 2) * 30, pp.y + (270 - pp.y) * e - Math.sin(uu * Math.PI) * 120, 22); } }
+}
+function drawTray() {
+  const active = wonAt === null && lostAt === null;
+  for (let i = 0; i < 3; i++) {
+    const isSel = i === selected && active;
+    hexPath(TX[i], TY + 22, R + 6); ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.fill();
+    hexPath(TX[i], TY + 16, R + 6); ctx.fillStyle = isSel ? '#2a6f6a' : '#1f4d63'; ctx.fill(); ctx.lineWidth = isSel ? 8 : 3; ctx.strokeStyle = isSel ? '#ffd166' : 'rgba(255,255,255,.18)'; ctx.stroke();
+  }
+  for (let i = 0; i < 3; i++) {
+    const cs = G.tray[i]; if (!cs) continue; const isSel = i === selected && active; const held = isSel && drag && drag.moved;
+    const s = back(tw(ta, trayAt, trayAt + .2)); if (s <= 0) continue;
+    let x = TX[i], y = TY; if (held) { x = drag.x; y = drag.y - HELD_DY; } else if (isSel) y -= 34 + Math.sin(tReal * 6) * 6;
+    ctx.save(); if (isSel) { ctx.shadowColor = held ? 'rgba(0,0,0,.4)' : 'rgba(255,209,102,.9)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = held ? 40 : 0; }
+    cs.forEach((c, j) => drawTile(c, x, y - j * TH * s, 1, s)); ctx.restore();
+  }
+}
+function render() {
+  ctx.clearRect(0, 0, W, H); drawBg(); drawTiles(); drawTray(); drawPops();
+  // titre + HUD
+  ctx.save(); ctx.font = `900 84px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round'; ctx.lineWidth = 18; ctx.strokeStyle = STROKE;
+  ctx.strokeText('Hexa Cascade', W / 2, 110); ctx.fillStyle = '#ffd166'; ctx.fillText('Hexa Cascade', W / 2, 110); ctx.restore();
+  pill(60, 218, 330, 104, `Niveau ${levelIdx + 1}/3`);
+  let pend = 0, bump = 0; for (const p of pops) { const d = ta - (p.t + .3); if (d < 0) pend += p.n; else if (d < .3) bump = Math.max(bump, Math.sin(d / .3 * Math.PI) * .18); }
+  drawCounter(coins - pend * 10, bump, 270);
+  // objectif : barre de progression
+  const done = Math.min(G.L.target, G.popped - pend), bx = 60, by = 352, bw = W - 120, bh = 64;
+  ctx.save(); rr(bx, by, bw, bh, bh / 2); ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.fill();
+  if (done > 0) { ctx.save(); rr(bx, by, bw, bh, bh / 2); ctx.clip(); const g = ctx.createLinearGradient(bx, 0, bx + bw, 0); g.addColorStop(0, '#14b8a6'); g.addColorStop(1, '#22c55e'); ctx.fillStyle = g; ctx.fillRect(bx, by, bw * done / G.L.target, bh); ctx.restore(); }
+  ctx.font = `bold 44px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round'; ctx.lineWidth = 8; ctx.strokeStyle = 'rgba(0,0,0,.55)';
+  const lab = `Objectif : ${done} / ${G.L.target} tuiles`; ctx.strokeText(lab, W / 2, by + bh / 2 + 3); ctx.fillStyle = '#fff'; ctx.fillText(lab, W / 2, by + bh / 2 + 3); ctx.restore();
+  playX = playX.filter(k => tReal - k[2] < .55); playX.forEach(([x, y, t0]) => drawX(x, y, tw(tReal, t0, t0 + .3)));
+  playRipples = playRipples.filter(k => tReal - k[2] < .45); playRipples.forEach(([x, y, t0]) => drawRipple(x, y, tw(tReal, t0, t0 + .45)));
+  // aide : anneau sur la pile à prendre, puis sur la case où la poser (au début, puis après 5 s sans action)
+  const active = wonAt === null && lostAt === null && !drag;
+  if (active) { const idle = tReal - lastTap > 5, tuto = levelIdx === 0 && G.placed < 2;
+    if (selected < 0 && (!tapped || idle || tuto)) { const m = hint(); if (m) ring(TX[m.slot], TY - 20, 112); }
+    else if (selected >= 0 && (idle || tuto)) { const m = hint(); if (m) ring(...cellXY(m.k), 70); } }
+  // texte bas
+  let line = selected >= 0 ? 'Touche une case vide pour la poser' : (!tapped || (levelIdx === 0 && G.placed < 2) ? 'Touche une pile, puis une case vide' : `${POP_N} tuiles identiques = explosion !`);
+  let col = '#d6ecf5';
+  if (msg && tReal - msg[1] < 2.2) { line = msg[0]; col = '#ffb4a8'; }
+  ctx.save(); ctx.font = `bold 46px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = col; ctx.fillText(line, W / 2, 1765); ctx.restore();
+  if (lostAt !== null && ta >= lostAt) { track('DemoFail' + (levelIdx + 1), { popped: G.popped });
+    const a = tw(ta, lostAt, lostAt + .3) * .45; const g = ctx.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .75); g.addColorStop(0, 'rgba(230,57,70,0)'); g.addColorStop(1, `rgba(230,57,70,${a})`); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    drawBanner('Raté ! Réessaie', tw(ta, lostAt + .1, lostAt + .35), 960); if (ta - lostAt > 1.2) { coins = coinsAtStart; startLevel(levelIdx); } return; }
+  // fin de niveau
+  if (wonAt !== null && ta >= wonAt) { if (!wonSent) { wonSent = true; track('DemoLevel' + (levelIdx + 1), { placed: G.placed, fails }); }
+    drawBanner(levelIdx === 2 ? 'Démo terminée !' : 'Niveau terminé !', tw(ta, wonAt, wonAt + .25), 960);
+    if (ta - wonAt > 1.0 && !ended) { if (levelIdx < 2) startLevel(levelIdx + 1); else endDemo(); } }
+}
+function endDemo() { ended = true; track('DemoDone', { coins, fails });
+  document.getElementById('endtxt').textContent = `Tu as gagné ${coins} pièces et terminé la démo. Le jeu complet arrive bientôt sur Android, avec des centaines de niveaux et une île à faire grandir.`;
+  document.getElementById('end').style.display = 'flex'; }
+document.getElementById('again').onclick = () => { document.getElementById('end').style.display = 'none'; ended = false; coins = 0; fails = 0; startLevel(0); document.getElementById('cta').style.display = ''; document.getElementById('form').style.display = 'none'; };
+document.getElementById('cta').onclick = () => { track('DemoWant'); document.getElementById('cta').style.display = 'none'; document.getElementById('form').style.display = 'block'; };
+document.getElementById('f').onsubmit = e => { e.preventDefault(); if (window.onDemoEmail) window.onDemoEmail(e.target); else { document.getElementById('form').style.display = 'none'; document.getElementById('ok').style.display = 'block'; } };
+
+startLevel(0); let last = performance.now();
+function loop(now) { const dt = Math.min(.05, (now - last) / 1000); tReal += dt; ta += dt; last = now; render(); requestAnimationFrame(loop); }
+requestAnimationFrame(loop);
+const toCv = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height]; };
+cv.addEventListener('pointerdown', e => { e.preventDefault(); onDown(...toCv(e)); });
+window.addEventListener('pointermove', e => { if (drag) onMove(...toCv(e)); });
+window.addEventListener('pointerup', () => onUp());
+window.addEventListener('pointercancel', () => { drag = null; });
+const taps = m => m ? [[TX[m.slot], TY - 20], cellXY(m.k)] : null;
+const idleOk = () => !ended && wonAt === null && lostAt === null;
+window.__demo = { get level() { return levelIdx; }, get ended() { return ended; }, get won() { return wonAt; }, get lost() { return lostAt; }, get popped() { return G.popped; }, get target() { return G.L.target; },
+  get lastPopped() { return lastPopped; }, get nextPopIn() { const f = pops.filter(q => q.t > ta).map(q => q.t - ta); return f.length ? Math.min(...f) : null; }, get popCount() { return popCount; }, get coins() { return coins; }, get selected() { return selected; }, get empties() { return emptyKeys(G).length; }, get tray() { return G.tray; },
+  autoMove() { return idleOk() ? taps(greedyMove(G, 1)) : null; }, badMove() { return idleOk() ? taps(greedyMove(G, -1)) : null; },
+  adv(dt) { tReal += dt; ta += dt; render(); } };
+</script>
+</body>
+</html>
